@@ -22,8 +22,10 @@ app.use(cookieParser());
 import userRoutes from "./routes/user.routes.js";
 import podRoutes from "./routes/pod.routes.js";
 import CheckInRoutes from "./routes/checkIn.route.js";
+import streakRoutes from "./routes/streak.route.js";
 //routes declaration
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/pods", podRoutes);
 app.use("/api/v1/pods", CheckInRoutes);
+app.use("/api/v1/pods", streakRoutes);
 export {app}

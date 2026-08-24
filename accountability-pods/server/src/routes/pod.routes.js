@@ -7,6 +7,7 @@ import {
   joinPod,
   leavePod,
   updatePod,
+  getPodMembers,
 } from "../controllers/pod.controller.js";
 
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -33,5 +34,9 @@ router
 router
   .route("/:id/leave")
   .delete(verifyJWT, leavePod);
+
+router
+  .route("/:id/members")
+  .get(verifyJWT, getPodMembers);
 
 export default router;

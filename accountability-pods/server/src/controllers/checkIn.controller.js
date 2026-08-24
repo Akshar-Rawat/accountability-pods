@@ -1,9 +1,11 @@
 import CheckIn from "../models/checkIn.model.js";
 import Pod from "../models/pods.model.js";
+import Streak from "../models/streak.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { getTodayInTimezone } from "../utils/dateUtils.js";
+import { calculateStreak } from "../services/streak.service.js";
 
 const createCheckIn = asyncHandler(async (req, res) => {
   const { podId } = req.params;
@@ -41,9 +43,39 @@ const createCheckIn = asyncHandler(async (req, res) => {
     note,
     photoUrl,
   });
+
+  let streak = await Streak.findOne({ pod: podId, user: userId });
+
+  if (!streak) {
+    streak = await Streak.create({
+      pod: podId,
+      user: userId,
+      currentStreak: 0,
+      longestStreak: 0,
+      lastCheckInDate: null,
+    });
+  }
+
+  const { currentStreak, longestStreak, lastCheckInDate } = calculateStreak({
+    currentStreak: streak.currentStreak,
+    longestStreak: streak.longestStreak,
+    lastCheckInDate: streak.lastCheckInDate,
+    today,
+  });
+
+  await Streak.findByIdAndUpdate(streak._id, {
+    currentStreak,
+    longestStreak,
+    lastCheckInDate,
+  });
+
   return res
     .status(201)
-    .json(new ApiResponse(201, checkIn, "Check-in created successfully"));
+    .json(new ApiResponse(201, {checkIn,streak:{
+    currentStreak,
+    longestStreak,
+    lastCheckInDate
+    }}, "Check-in created successfully"));
 });
 const getTodaysCheckIns = asyncHandler(async (req, res) => {
   const { podId } = req.params;

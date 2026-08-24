@@ -3,7 +3,6 @@ import Pod from "../models/pods.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { populate } from "dotenv";
 
 const createPod = asyncHandler(async (req, res) => {
   const { name, goal, frequency, customDays } = req.body;
@@ -13,7 +12,7 @@ const createPod = asyncHandler(async (req, res) => {
   if (!name || !goal || !frequency) {
     throw new ApiError(400, "Name, goal and frequency are required");
   }
-  if (frequency === "custom" && (!customDays || customDays.length === 0)) {
+  if (frequency === "weekly" && (!customDays || customDays.length === 0)) {
     throw new ApiError(400, "Custom days are required for weekly frequency");
   }
   const pod = await Pod.create({
@@ -44,7 +43,7 @@ const getPodById = asyncHandler(async (req, res) => {
   if (!pod) {
     throw new ApiError(404, "Pod not found");
   }
-  const populatedPod = await pod.populate("members", "name avatarUrl");
+  const populatedPod = await pod.populate("members", "username email avatar");
   return res
     .status(200)
     .json(new ApiResponse(200, populatedPod, "Pod retrieved successfully"));
@@ -110,8 +109,8 @@ const updatePod = asyncHandler(async (req, res) => {
     throw new ApiError(403, "User is not the admin of this pod");
   }
 
-  if (frequency === "custom" && (!customDays || customDays.length === 0)) {
-    throw new ApiError(400, "Custom days are required for custom frequency");
+  if (frequency === "weekly" && (!customDays || customDays.length === 0)) {
+    throw new ApiError(400, "Custom days are required for weekly frequency");
   }
 
   if (name !== undefined) pod.name = name;
@@ -144,4 +143,22 @@ const updatePod = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, pod, "Pod updated successfully"));
 });
 
-export { createPod, getMyPods, getPodById, joinPod, leavePod, updatePod };
+const getPodMembers = asyncHandler(async (req, res) => {
+  const podId = req.params.id;
+  const userId = req.user._id;
+
+  const pod = await Pod.findById(podId);
+  if (!pod) {
+    throw new ApiError(404, "Pod not found");
+  }
+
+  const isMember = pod.members.some((member) => member.equals(userId));
+  if (!isMember) {
+    throw new ApiError(403, "You are not a member of this pod");
+  }
+  const members = await Pod.findById(podId).populate("members", "username email avatar");
+
+  return res.status(200).json(new ApiResponse(200, members.members, "Pod members retrieved successfully"));
+});
+
+export { createPod, getMyPods, getPodById, joinPod, leavePod, updatePod, getPodMembers  }; 
