@@ -82,7 +82,10 @@ const leavePod = asyncHandler(async (req, res) => {
   if (pod.admin.equals(userId)) {
     const newAdmin = pod.members.find((member) => !member.equals(userId));
     if (!newAdmin) {
-      throw new ApiError(400, "Cannot leave pod as the only member");
+      await Pod.findByIdAndDelete(podId);
+      await CheckIn.deleteMany({ pod: podId });
+      await Streak.deleteMany({ pod: podId });
+      return res.status(200).json(new ApiResponse(200, {}, "Pod deleted successfully as you were the last member"));
     }
     pod.admin = newAdmin;
   }

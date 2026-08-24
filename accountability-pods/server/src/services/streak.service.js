@@ -1,10 +1,12 @@
-import { getDaysDifference } from "../utils/dateUtils.js";
+import { getDaysDifference, getNextExpectedDate } from "../utils/dateUtils.js";
 
 const calculateStreak = ({
   currentStreak,
   longestStreak,
   lastCheckInDate,
   today,
+  frequency = "daily",
+  customDays = []
 }) => {
   if (!lastCheckInDate) {
     currentStreak = 1;
@@ -18,22 +20,21 @@ const calculateStreak = ({
     };
   }
 
-  const daysDifference = getDaysDifference(
-    lastCheckInDate,
-    today
-  );
+  const expectedNextDate = getNextExpectedDate(lastCheckInDate, frequency, customDays);
+  const diffFromExpected = getDaysDifference(expectedNextDate, today);
 
-  if (daysDifference === 1) {
+  if (diffFromExpected === 0) {
     currentStreak += 1;
-
     if (currentStreak > longestStreak) {
       longestStreak = currentStreak;
     }
-  } else if (daysDifference > 1) {
+    lastCheckInDate = today;
+  } else if (diffFromExpected > 0) {
     currentStreak = 1;
+    lastCheckInDate = today;
+  } else {
+    lastCheckInDate = today;
   }
-
-  lastCheckInDate = today;
 
   return {
     currentStreak,

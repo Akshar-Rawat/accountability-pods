@@ -61,6 +61,8 @@ const createCheckIn = asyncHandler(async (req, res) => {
     longestStreak: streak.longestStreak,
     lastCheckInDate: streak.lastCheckInDate,
     today,
+    frequency: pod.frequency,
+    customDays: pod.customDays
   });
 
   await Streak.findByIdAndUpdate(streak._id, {
