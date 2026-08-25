@@ -36,48 +36,65 @@ const createCheckIn = asyncHandler(async (req, res) => {
   if (existingCheckIn) {
     throw new ApiError(409, "You have already checked in today");
   }
-  const checkIn = await CheckIn.create({
-    pod: podId,
-    user: userId,
-    date: today,
-    note,
-    photoUrl,
-  });
+  let checkIn;
+  try {
+    checkIn = await CheckIn.create({
+      pod: podId,
+      user: userId,
+      date: today,
+      note,
+      photoUrl,
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      throw new ApiError(409, "You have already checked in today");
+    }
+    throw error;
+  }
 
   let streak = await Streak.findOne({ pod: podId, user: userId });
 
-  if (!streak) {
-    streak = await Streak.create({
-      pod: podId,
-      user: userId,
-      currentStreak: 0,
-      longestStreak: 0,
-      lastCheckInDate: null,
-    });
-  }
-
-  const { currentStreak, longestStreak, lastCheckInDate } = calculateStreak({
-    currentStreak: streak.currentStreak,
-    longestStreak: streak.longestStreak,
-    lastCheckInDate: streak.lastCheckInDate,
+  const { currentStreak, longestStreak, lastCheckInDate } =
+  calculateStreak({
+    currentStreak: streak?.currentStreak || 0,
+    longestStreak: streak?.longestStreak || 0,
+    lastCheckInDate: streak?.lastCheckInDate || null,
     today,
     frequency: pod.frequency,
-    customDays: pod.customDays
+    customDays: pod.customDays,
   });
 
-  await Streak.findByIdAndUpdate(streak._id, {
-    currentStreak,
-    longestStreak,
-    lastCheckInDate,
-  });
-
-  return res
-    .status(201)
-    .json(new ApiResponse(201, {checkIn,streak:{
-    currentStreak,
-    longestStreak,
-    lastCheckInDate
-    }}, "Check-in created successfully"));
+await Streak.findOneAndUpdate(
+  {
+    pod: podId,
+    user: userId,
+  },
+  {
+    $set: {
+      currentStreak,
+      longestStreak,
+      lastCheckInDate,
+    },
+  },
+  {
+    new: true,
+    upsert: true,
+  }
+);
+  return res.status(201).json(
+    new ApiResponse(
+      201,
+      {
+        checkIn,
+        streak: {
+          currentStreak,
+          longestStreak,
+          lastCheckInDate,
+        },
+      },
+      "Check-in created successfully",
+    ),
+  );
 });
 const getTodaysCheckIns = asyncHandler(async (req, res) => {
   const { podId } = req.params;
@@ -89,9 +106,7 @@ const getTodaysCheckIns = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Pod not found");
   }
 
-  const isMember = pod.members.some((member) =>
-    member.equals(userId)
-  );
+  const isMember = pod.members.some((member) => member.equals(userId));
 
   if (!isMember) {
     throw new ApiError(403, "You are not a member of this pod");
@@ -110,8 +125,8 @@ const getTodaysCheckIns = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         checkIns,
-        "Today's check-ins retrieved successfully"
-      )
+        "Today's check-ins retrieved successfully",
+      ),
     );
 });
 
@@ -131,7 +146,6 @@ const getCheckInHistory = asyncHandler(async (req, res) => {
     throw new ApiError(403, "You are not a member of this pod");
   }
 
-
   const checkIns = await CheckIn.find({
     pod: podId,
     user: userId,
@@ -140,14 +154,8 @@ const getCheckInHistory = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new ApiResponse(
-        200,
-        checkIns,
-        "Check-in history retrieved successfully"
-      )
+      new ApiResponse(200, checkIns, "Check-in history retrieved successfully"),
     );
 });
 
-
-
-export {createCheckIn, getTodaysCheckIns, getCheckInHistory}
+export { createCheckIn, getTodaysCheckIns, getCheckInHistory };

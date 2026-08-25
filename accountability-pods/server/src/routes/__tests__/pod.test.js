@@ -4,7 +4,8 @@ import { app } from "../../app.js";
 import Pod from "../../models/pods.model.js";
 import { createTestUser, createTestPod } from "../../test/helpers.js";
 import mongoose from "mongoose";
-
+import CheckIn from "../../models/checkIn.model.js";
+import Streak from "../../models/streak.model.js";
 describe("Pod Routes", () => {
   describe("POST /api/v1/pods", () => {
     it("should create a pod successfully", async () => {
@@ -166,6 +167,57 @@ describe("Pod Routes", () => {
       expect(dbPod.members).toHaveLength(1);
     });
   });
+  it("should delete pod, check-ins, and streak when the only member leaves", async () => {
+  const { token, user } = await createTestUser();
+
+  const pod = await createTestPod(user._id);
+
+  // Create a check-in for the pod
+  await CheckIn.create({
+    pod: pod._id,
+    user: user._id,
+    date: "2026-01-01",
+    note: "Test check-in",
+  });
+
+  // Create a streak for the pod
+  await Streak.create({
+    pod: pod._id,
+    user: user._id,
+    currentStreak: 1,
+    longestStreak: 1,
+    lastCheckInDate: "2026-01-01",
+  });
+
+  const res = await request(app)
+    .delete(`/api/v1/pods/${pod._id}/leave`)
+    .set("Authorization", `Bearer ${token}`);
+
+  expect(res.status).toBe(200);
+
+  expect(res.body.message).toBe(
+    "Pod deleted successfully as you were the last member"
+  );
+
+  // Pod should be deleted
+  const deletedPod = await Pod.findById(pod._id);
+
+  expect(deletedPod).toBeNull();
+
+  // Check-ins should be deleted
+  const checkIns = await CheckIn.find({
+    pod: pod._id,
+  });
+
+  expect(checkIns).toHaveLength(0);
+
+  // Streak should be deleted
+  const streaks = await Streak.find({
+    pod: pod._id,
+  });
+
+  expect(streaks).toHaveLength(0);
+});
 
   describe("GET /api/v1/pods/:id/members", () => {
     it("should allow members to get pod members", async () => {

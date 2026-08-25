@@ -3,7 +3,8 @@ import Pod from "../models/pods.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-
+import CheckIn from "../models/checkIn.model.js";
+import Streak from "../models/streak.model.js";
 const createPod = asyncHandler(async (req, res) => {
   const { name, goal, frequency, customDays } = req.body;
   const adminId = req.user._id;
@@ -82,9 +83,9 @@ const leavePod = asyncHandler(async (req, res) => {
   if (pod.admin.equals(userId)) {
     const newAdmin = pod.members.find((member) => !member.equals(userId));
     if (!newAdmin) {
-      await Pod.findByIdAndDelete(podId);
       await CheckIn.deleteMany({ pod: podId });
       await Streak.deleteMany({ pod: podId });
+      await Pod.findByIdAndDelete(podId);
       return res.status(200).json(new ApiResponse(200, {}, "Pod deleted successfully as you were the last member"));
     }
     pod.admin = newAdmin;
@@ -159,9 +160,9 @@ const getPodMembers = asyncHandler(async (req, res) => {
   if (!isMember) {
     throw new ApiError(403, "You are not a member of this pod");
   }
-  const members = await Pod.findById(podId).populate("members", "username email avatar");
+await Pod.findById(podId).populate("members", "username email avatar");
 
-  return res.status(200).json(new ApiResponse(200, members.members, "Pod members retrieved successfully"));
+  return res.status(200).json(new ApiResponse(200, pod.members, "Pod members retrieved successfully"));
 });
 
 export { createPod, getMyPods, getPodById, joinPod, leavePod, updatePod, getPodMembers  }; 
