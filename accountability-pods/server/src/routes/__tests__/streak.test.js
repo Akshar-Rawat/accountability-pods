@@ -1,11 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-
 import request from "supertest";
 
 import { app } from "../../app.js";
-
 import Streak from "../../models/streak.model.js";
-
 import { createTestUser, createTestPod } from "../../test/helpers.js";
 
 describe("Streak Flow & Routes", () => {
@@ -87,7 +84,6 @@ describe("Streak Flow & Routes", () => {
 
       // Longest streak should remain 2
       expect(streak.longestStreak).toBe(2);
-
       expect(streak.lastCheckInDate).toBe("2026-01-04");
 
       // Day 5: Consecutive again
@@ -159,9 +155,7 @@ describe("Streak Flow & Routes", () => {
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(200);
-
       expect(res.body.data).toBeDefined();
-
       expect(res.body.data.currentStreak).toBe(1);
       expect(res.body.data.longestStreak).toBe(1);
       expect(res.body.data.lastCheckInDate).toBe("2026-01-01");
@@ -180,15 +174,15 @@ describe("Streak Flow & Routes", () => {
     });
 
     it("should return 403 if user is not a member", async () => {
-      const admin = await createTestUser();
+      const { user: admin } = await createTestUser();
 
-      const pod = await createTestPod(admin.user._id);
+      const pod = await createTestPod(admin._id);
 
-      const nonMember = await createTestUser();
+      const { token: nonMemberToken } = await createTestUser();
 
       const res = await request(app)
         .get(`/api/v1/pods/${pod._id}/streak`)
-        .set("Authorization", `Bearer ${nonMember.token}`);
+        .set("Authorization", `Bearer ${nonMemberToken}`);
 
       expect(res.status).toBe(403);
     });
@@ -198,7 +192,9 @@ describe("Streak Flow & Routes", () => {
 
       const pod = await createTestPod(user._id);
 
-      const res = await request(app).get(`/api/v1/pods/${pod._id}/streak`);
+      const res = await request(app).get(
+        `/api/v1/pods/${pod._id}/streak`
+      );
 
       expect(res.status).toBe(401);
     });
@@ -213,6 +209,125 @@ describe("Streak Flow & Routes", () => {
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(404);
+    });
+  });
+
+  // =========================================================
+  // GET POD STREAKS / LEADERBOARD
+  // =========================================================
+
+  describe("GET /api/v1/pods/:podId/streaks", () => {
+    it("should return all pod streaks sorted by currentStreak descending", async () => {
+      const { token, user: user1 } = await createTestUser({
+        timezone: "UTC",
+      });
+
+      const { user: user2 } = await createTestUser({
+        timezone: "UTC",
+      });
+
+      const pod = await createTestPod(user1._id);
+
+      // Add second user to the pod
+      pod.members.push(user2._id);
+      await pod.save();
+
+      // User 1 streak
+      await Streak.create({
+        pod: pod._id,
+        user: user1._id,
+        currentStreak: 3,
+        longestStreak: 5,
+        lastCheckInDate: "2026-01-03",
+      });
+
+      // User 2 streak
+      await Streak.create({
+        pod: pod._id,
+        user: user2._id,
+        currentStreak: 7,
+        longestStreak: 10,
+        lastCheckInDate: "2026-01-07",
+      });
+
+      const res = await request(app)
+        .get(`/api/v1/pods/${pod._id}/streaks`)
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(res.status).toBe(200);
+
+      expect(res.body.data).toBeDefined();
+      expect(res.body.data).toHaveLength(2);
+
+      // Highest current streak should come first
+      expect(res.body.data[0].currentStreak).toBe(7);
+      expect(res.body.data[1].currentStreak).toBe(3);
+
+      // Verify longest streak
+      expect(res.body.data[0].longestStreak).toBe(10);
+      expect(res.body.data[1].longestStreak).toBe(5);
+
+      // Verify last check-in dates
+      expect(res.body.data[0].lastCheckInDate).toBe("2026-01-07");
+      expect(res.body.data[1].lastCheckInDate).toBe("2026-01-03");
+
+      // Verify populated user
+      expect(res.body.data[0].user).toBeDefined();
+      expect(res.body.data[0].user.username).toBe(user2.username);
+
+      expect(res.body.data[1].user).toBeDefined();
+      expect(res.body.data[1].user.username).toBe(user1.username);
+    });
+
+    it("should return 404 if the pod does not exist", async () => {
+      const { token } = await createTestUser();
+
+      const fakePodId = "507f1f77bcf86cd799439011";
+
+      const res = await request(app)
+        .get(`/api/v1/pods/${fakePodId}/streaks`)
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(res.status).toBe(404);
+    });
+
+    it("should return 403 if user is not a member", async () => {
+      const { user: admin } = await createTestUser();
+
+      const pod = await createTestPod(admin._id);
+
+      const { token: nonMemberToken } = await createTestUser();
+
+      const res = await request(app)
+        .get(`/api/v1/pods/${pod._id}/streaks`)
+        .set("Authorization", `Bearer ${nonMemberToken}`);
+
+      expect(res.status).toBe(403);
+    });
+
+    it("should return 401 if user is not authenticated", async () => {
+      const { user } = await createTestUser();
+
+      const pod = await createTestPod(user._id);
+
+      const res = await request(app).get(
+        `/api/v1/pods/${pod._id}/streaks`
+      );
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return an empty array if the pod has no streaks", async () => {
+      const { token, user } = await createTestUser();
+
+      const pod = await createTestPod(user._id);
+
+      const res = await request(app)
+        .get(`/api/v1/pods/${pod._id}/streaks`)
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data).toEqual([]);
     });
   });
 });
