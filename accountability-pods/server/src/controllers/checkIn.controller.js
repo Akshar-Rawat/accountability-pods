@@ -77,7 +77,7 @@ await Streak.findOneAndUpdate(
     },
   },
   {
-    new: true,
+   returnDocument: "after",
     upsert: true,
   }
 );
@@ -117,7 +117,7 @@ const getTodaysCheckIns = asyncHandler(async (req, res) => {
   const checkIns = await CheckIn.find({
     pod: podId,
     date: today,
-  });
+  }).populate("user","username avatar");
 
   return res
     .status(200)
@@ -157,5 +157,7 @@ const getCheckInHistory = asyncHandler(async (req, res) => {
       new ApiResponse(200, checkIns, "Check-in history retrieved successfully"),
     );
 });
+
+
 
 export { createCheckIn, getTodaysCheckIns, getCheckInHistory };

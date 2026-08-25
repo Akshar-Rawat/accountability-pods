@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import CheckIn from "../models/checkIn.model.js";
 import Streak from "../models/streak.model.js";
+
 const createPod = asyncHandler(async (req, res) => {
   const { name, goal, frequency, customDays } = req.body;
   const adminId = req.user._id;
