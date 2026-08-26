@@ -153,6 +153,83 @@
    --spinner-size-sm: 16px;
    --spinner-size-md: 20px;
    --spinner-size-lg: 24px;
+   /* =================================
+   COMPONENT TOKENS — INPUT
+   ================================= */
+
+--input-height-sm: 36px;
+--input-height-md: 40px;
+--input-height-lg: 48px;
+
+--input-padding-x-sm: 12px;
+--input-padding-x-md: 16px;
+--input-padding-x-lg: 16px;
+
+--input-radius: var(--radius-lg);
+--input-border-width: 1px;
+
+--input-label-spacing: 6px;
+--input-helper-spacing: 6px;
+
+--input-focus-ring-width: 2px;
+--input-focus-ring-offset: 2px;
+
+/* =================================
+   COMPONENT TOKENS — CARD
+   ================================= */
+--card-radius: var(--radius-lg);
+--card-padding: 24px;
+--card-radius: var(--radius-lg);
+
+--card-padding-sm: 12px;
+--card-padding-md: 16px;
+--card-padding-lg: 24px;
+
+--card-border-width: 1px;
+
+/* =================================
+   COMPONENT TOKENS — BADGE
+   ================================= */
+
+--badge-height-sm: 24px;
+--badge-height-md: 28px;
+--badge-height-lg: 32px;
+
+--badge-padding-x-sm: 8px;
+--badge-padding-x-md: 10px;
+--badge-padding-x-lg: 12px;
+
+--badge-radius: var(--radius-full);
+--badge-font-weight: 500;
+
+/* =================================
+   COMPONENT TOKENS — AVATAR
+   ================================= */
+
+--avatar-size-sm: 32px;
+--avatar-size-md: 40px;
+--avatar-size-lg: 48px;
+
+--avatar-font-size-sm: 11px;
+--avatar-font-size-md: 13px;
+--avatar-font-size-lg: 16px;
+
+--avatar-radius: var(--radius-full);
+
+/* =================================
+   COMPONENT TOKENS — DIVIDER
+   ================================= */
+
+--divider-thickness: 1px;
+--divider-color: var(--outline-variant);
+
+--progress-gradient: linear-gradient(
+  90deg,
+  var(--secondary-fixed-dim),
+  var(--secondary-container)
+);
+
+
 }
 
 
