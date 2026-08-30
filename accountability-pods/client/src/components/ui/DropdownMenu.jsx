@@ -1,129 +1,223 @@
-import React, { useEffect, useId, useRef, useState } from "react";
+import React, {
+  forwardRef,
+  useEffect,
+  useRef,
+} from "react";
+
 import { cn } from "../../lib/utils";
 
 const DropdownMenu = ({
-  trigger,
-  items = [],
-  onSelect,
-  align = "left",
+  children,
   className,
 }) => {
-  const [open, setOpen] = useState(false);
-  const menuRef = useRef(null);
-  const menuId = useId();
+  return (
+    <div
+      className={cn(
+        "relative inline-block",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+};
+
+DropdownMenu.displayName = "DropdownMenu";
+
+const DropdownMenuTrigger = forwardRef(
+  (
+    {
+      children,
+      className,
+      onClick,
+      ...props
+    },
+    ref,
+  ) => {
+    return (
+      <button
+        ref={ref}
+        type="button"
+        className={cn(
+          "inline-flex items-center justify-center gap-2",
+          "rounded-[var(--radius-lg)]",
+          "text-body-sm font-medium text-on-surface",
+          "transition-colors",
+          "hover:bg-surface-container-low",
+          "focus-visible:outline-2",
+          "focus-visible:outline-offset-2",
+          "focus-visible:outline-outline",
+          className,
+        )}
+        onClick={onClick}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  },
+);
+
+DropdownMenuTrigger.displayName = "DropdownMenuTrigger";
+
+const DropdownMenuContent = ({
+  children,
+  open,
+  className,
+  align = "end",
+  onClose,
+}) => {
+  const contentRef = useRef(null);
 
   useEffect(() => {
+    if (!open) return;
+
     const handleClickOutside = (event) => {
       if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target)
+        contentRef.current &&
+        !contentRef.current.contains(event.target)
       ) {
-        setOpen(false);
+        onClose?.();
       }
     };
 
     const handleEscape = (event) => {
       if (event.key === "Escape") {
-        setOpen(false);
+        onClose?.();
       }
     };
 
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleEscape);
-    }
+    document.addEventListener(
+      "mousedown",
+      handleClickOutside,
+    );
+
+    document.addEventListener(
+      "keydown",
+      handleEscape,
+    );
 
     return () => {
       document.removeEventListener(
         "mousedown",
         handleClickOutside,
       );
-      document.removeEventListener("keydown", handleEscape);
+
+      document.removeEventListener(
+        "keydown",
+        handleEscape,
+      );
     };
-  }, [open]);
+  }, [open, onClose]);
 
-  const handleItemClick = (item) => {
-    if (item.disabled) return;
-
-    onSelect?.(item.value, item);
-
-    item.onClick?.();
-
-    setOpen(false);
-  };
-
-  const alignClasses = {
-    left: "left-0",
-    right: "right-0",
-  };
+  if (!open) {
+    return null;
+  }
 
   return (
     <div
-      ref={menuRef}
-      className={cn("relative inline-block", className)}
-    >
-      <button
-        type="button"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-controls={menuId}
-        onClick={() => setOpen((previous) => !previous)}
-      >
-        {trigger}
-      </button>
-
-      {open && (
-        <div
-          id={menuId}
-          role="menu"
-          className={cn(
-            "absolute z-50 mt-2 min-w-48 overflow-hidden",
-            "rounded-[var(--radius-lg)]",
-            "border border-outline-variant",
-            "bg-surface-container-lowest",
-            "p-1 shadow-lg",
-            alignClasses[align] || alignClasses.left,
-          )}
-        >
-          {items.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <button
-                key={item.value}
-                type="button"
-                role="menuitem"
-                disabled={item.disabled}
-                onClick={() => handleItemClick(item)}
-                className={cn(
-                  "flex w-full items-center gap-2 rounded-[var(--radius)] px-3 py-2",
-                  "text-left text-body-sm",
-                  "transition-colors",
-                  "focus-visible:outline-2",
-                  "focus-visible:outline-offset-[-2px]",
-                  "focus-visible:outline-outline",
-                  "disabled:cursor-not-allowed disabled:opacity-50",
-
-                  item.danger
-                    ? "text-error hover:bg-error-container"
-                    : "text-on-surface hover:bg-surface-container",
-                )}
-              >
-                {Icon && (
-                  <Icon
-                    size={16}
-                    aria-hidden="true"
-                  />
-                )}
-
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
+      ref={contentRef}
+      role="menu"
+      className={cn(
+        
+        "absolute z-50 top-full mt-2",
+        "w-40",
+        "overflow-hidden",
+        "rounded-[var(--radius-lg)]",
+        "border border-outline-variant",
+        "bg-surface-container-lowest",
+        "p-1",
+        "shadow-lg",
+        align === "end"
+          ? "right-0"
+          : "left-0",
+        className,
       )}
+    >
+      {children}
     </div>
   );
+};
+
+DropdownMenuContent.displayName = "DropdownMenuContent";
+
+const DropdownMenuItem = forwardRef(
+  (
+    {
+      children,
+      icon: Icon,
+      disabled = false,
+      danger = false,
+      className,
+      onClick,
+      ...props
+    },
+    ref,
+  ) => {
+    return (
+      <button
+        ref={ref}
+        type="button"
+        role="menuitem"
+        disabled={disabled}
+        onClick={onClick}
+        className={cn(
+          "flex w-full items-center gap-3",
+          "rounded-[var(--radius)]",
+          "px-3 py-2.5",
+          "text-left text-body-sm",
+          "transition-colors",
+          "focus-visible:outline-2",
+          "focus-visible:outline-offset-[-2px]",
+          "focus-visible:outline-outline",
+          "disabled:cursor-not-allowed",
+          "disabled:opacity-50",
+          danger
+            ? "text-error hover:bg-error-container"
+            : "text-on-surface hover:bg-surface-container-low",
+          className,
+        )}
+        {...props}
+      >
+        {Icon && (
+          <Icon
+            size={18}
+            aria-hidden="true"
+            className="shrink-0"
+          />
+        )}
+
+        <span>{children}</span>
+      </button>
+    );
+  },
+);
+
+DropdownMenuItem.displayName = "DropdownMenuItem";
+
+const DropdownMenuSeparator = ({
+  className,
+}) => {
+  return (
+    <div
+      role="separator"
+      className={cn(
+        "my-1 h-px bg-outline-variant",
+        className,
+      )}
+    />
+  );
+};
+
+DropdownMenuSeparator.displayName =
+  "DropdownMenuSeparator";
+
+export {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
 };
 
 export default DropdownMenu;

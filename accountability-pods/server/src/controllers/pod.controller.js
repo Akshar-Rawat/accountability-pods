@@ -1,31 +1,62 @@
 import { nanoid } from "nanoid";
+
 import Pod from "../models/pods.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+
 import CheckIn from "../models/checkIn.model.js";
 import Streak from "../models/streak.model.js";
 
+const validateCustomDays = (frequency, customDays) => {
+  if (frequency !== "custom") {
+    return [];
+  }
+
+  if (!Array.isArray(customDays) || customDays.length === 0) {
+    throw new ApiError(400, "Custom days are required for custom frequency");
+  }
+
+  const validDays = customDays.every(
+    (day) => Number.isInteger(day) && day >= 1 && day <= 7,
+  );
+
+  if (!validDays) {
+    throw new ApiError(400, "Custom days must contain values from 1 to 7");
+  }
+
+  return [...new Set(customDays)];
+};
+
 const createPod = asyncHandler(async (req, res) => {
   const { name, goal, frequency, customDays } = req.body;
+
   const adminId = req.user._id;
-  const inviteCode = nanoid(8);
 
   if (!name || !goal || !frequency) {
     throw new ApiError(400, "Name, goal and frequency are required");
   }
-  if (frequency === "weekly" && (!customDays || customDays.length === 0)) {
-    throw new ApiError(400, "Custom days are required for weekly frequency");
+
+  const allowedFrequencies = ["daily", "weekdays", "monthly", "custom"];
+
+  if (!allowedFrequencies.includes(frequency)) {
+    throw new ApiError(400, "Invalid frequency");
   }
+
+  const normalizedCustomDays = validateCustomDays(frequency, customDays);
+
+  const inviteCode = nanoid(8);
+
   const pod = await Pod.create({
     name,
     goal,
     frequency,
-    customDays,
+    customDays: normalizedCustomDays,
     members: [adminId],
     admin: adminId,
     inviteCode,
   });
+
   return res
     .status(201)
     .json(new ApiResponse(201, pod, "Pod created successfully"));
@@ -33,7 +64,11 @@ const createPod = asyncHandler(async (req, res) => {
 
 const getMyPods = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const pods = await Pod.find({ members: userId });
+
+  const pods = await Pod.find({
+    members: userId,
+  });
+
   return res
     .status(200)
     .json(new ApiResponse(200, pods, "Pods retrieved successfully"));
@@ -41,11 +76,15 @@ const getMyPods = asyncHandler(async (req, res) => {
 
 const getPodById = asyncHandler(async (req, res) => {
   const podId = req.params.id;
+
   const pod = await Pod.findById(podId);
+
   if (!pod) {
     throw new ApiError(404, "Pod not found");
   }
+
   const populatedPod = await pod.populate("members", "username email avatar");
+
   return res
     .status(200)
     .json(new ApiResponse(200, populatedPod, "Pod retrieved successfully"));
@@ -54,18 +93,27 @@ const getPodById = asyncHandler(async (req, res) => {
 const joinPod = asyncHandler(async (req, res) => {
   const inviteCode = req.params.inviteCode;
   const userId = req.user._id;
-  const pod = await Pod.findOne({ inviteCode });
+
+  const pod = await Pod.findOne({
+    inviteCode,
+  });
+
   if (!pod) {
     throw new ApiError(404, "Pod not found");
   }
+
   if (pod.members.some((member) => member.equals(userId))) {
     throw new ApiError(400, "User is already a member of this pod");
   }
+
   if (pod.members.length >= pod.maxMembers) {
     throw new ApiError(400, "Pod is full");
   }
+
   pod.members.push(userId);
+
   await pod.save();
+
   return res
     .status(200)
     .json(new ApiResponse(200, pod, "Joined pod successfully"));
@@ -74,25 +122,49 @@ const joinPod = asyncHandler(async (req, res) => {
 const leavePod = asyncHandler(async (req, res) => {
   const podId = req.params.id;
   const userId = req.user._id;
+
   const pod = await Pod.findById(podId);
+
   if (!pod) {
     throw new ApiError(404, "Pod not found");
   }
+
   if (!pod.members.some((member) => member.equals(userId))) {
     throw new ApiError(400, "User is not a member of this pod");
   }
+
   if (pod.admin.equals(userId)) {
     const newAdmin = pod.members.find((member) => !member.equals(userId));
+
     if (!newAdmin) {
-      await CheckIn.deleteMany({ pod: podId });
-      await Streak.deleteMany({ pod: podId });
+      await CheckIn.deleteMany({
+        pod: podId,
+      });
+
+      await Streak.deleteMany({
+        pod: podId,
+      });
+
       await Pod.findByIdAndDelete(podId);
-      return res.status(200).json(new ApiResponse(200, {}, "Pod deleted successfully as you were the last member"));
+
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            {},
+            "Pod deleted successfully as you were the last member",
+          ),
+        );
     }
+
     pod.admin = newAdmin;
   }
+
   pod.members = pod.members.filter((member) => !member.equals(userId));
+
   await pod.save();
+
   return res
     .status(200)
     .json(new ApiResponse(200, pod, "Left pod successfully"));
@@ -114,20 +186,34 @@ const updatePod = asyncHandler(async (req, res) => {
     throw new ApiError(403, "User is not the admin of this pod");
   }
 
-  if (frequency === "weekly" && (!customDays || customDays.length === 0)) {
-    throw new ApiError(400, "Custom days are required for weekly frequency");
-  }
-
-  if (name !== undefined) pod.name = name;
-
-  if (goal !== undefined) pod.goal = goal;
-
   if (frequency !== undefined) {
+    const allowedFrequencies = ["daily", "weekdays", "monthly", "custom"];
+
+    if (!allowedFrequencies.includes(frequency)) {
+      throw new ApiError(400, "Invalid frequency");
+    }
+
+    if (frequency === "custom") {
+      validateCustomDays(frequency, customDays);
+    }
+
     pod.frequency = frequency;
+
+    if (frequency !== "custom") {
+      pod.customDays = [];
+    }
   }
 
-  if (customDays !== undefined) {
-    pod.customDays = customDays;
+  if (name !== undefined) {
+    pod.name = name;
+  }
+
+  if (goal !== undefined) {
+    pod.goal = goal;
+  }
+
+  if (frequency === "custom" && customDays !== undefined) {
+    pod.customDays = [...new Set(customDays)];
   }
 
   if (maxMembers !== undefined) {
@@ -153,17 +239,32 @@ const getPodMembers = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
   const pod = await Pod.findById(podId);
+
   if (!pod) {
     throw new ApiError(404, "Pod not found");
   }
 
   const isMember = pod.members.some((member) => member.equals(userId));
+
   if (!isMember) {
     throw new ApiError(403, "You are not a member of this pod");
   }
-await Pod.findById(podId).populate("members", "username email avatar");
 
-  return res.status(200).json(new ApiResponse(200, pod.members, "Pod members retrieved successfully"));
+  await pod.populate("members", "username email avatar");
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, pod.members, "Pod members retrieved successfully"),
+    );
 });
 
-export { createPod, getMyPods, getPodById, joinPod, leavePod, updatePod, getPodMembers  }; 
+export {
+  createPod,
+  getMyPods,
+  getPodById,
+  joinPod,
+  leavePod,
+  updatePod,
+  getPodMembers,
+};

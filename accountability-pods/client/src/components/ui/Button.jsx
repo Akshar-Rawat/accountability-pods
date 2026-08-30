@@ -2,7 +2,7 @@ import React, { forwardRef } from "react";
 import { cn } from "../../lib/utils";
 import Spinner from "./Spinner";
 
-export const Button = forwardRef(
+const Button = forwardRef(
   (
     {
       size = "md",

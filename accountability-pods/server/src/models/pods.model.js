@@ -1,23 +1,35 @@
 import mongoose, { Schema } from "mongoose";
 
-const podSchema = new Schema({
-    name: { type: String,   
-        required: true,
-        trim: true,
-        index: true,
+const podSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      index: true,
     },
-    goal: { type: String,
-        required: true,
-        trim: true,
+
+    goal: {
+      type: String,
+      required: true,
+      trim: true,
     },
-    frequency: { type: String,
-        required: true,
-        enum: ["daily", "weekly", "monthly"],   
-        default: "daily",
+
+    frequency: {
+      type: String,
+      required: true,
+      enum: ["daily", "weekdays", "monthly", "custom"],
+      default: "daily",
     },
-  customDays: {
+
+    customDays: {
       type: [Number],
       default: [],
+      validate: {
+        validator: (days) =>
+          days.every((day) => Number.isInteger(day) && day >= 1 && day <= 7),
+        message: "Custom days must contain values from 1 to 7",
+      },
     },
 
     members: [
@@ -45,7 +57,7 @@ const podSchema = new Schema({
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Pod = mongoose.model("Pod", podSchema);
