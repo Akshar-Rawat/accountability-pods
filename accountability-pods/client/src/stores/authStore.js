@@ -6,9 +6,10 @@ const useAuthStore = create((set) => ({
   user: null,
   loading: false,
   isAuthenticated: false,
+  isRestoring: true,
 
   login: async (credentials) => {
-    set({ loading: true });
+    set({ loading: true, isRestoring: false });
 
     try {
       const response = await api.post("/users/login", credentials);
@@ -19,6 +20,7 @@ const useAuthStore = create((set) => ({
         user,
         isAuthenticated: true,
         loading: false,
+        isRestoring: false,
       });
 
       return user;
@@ -27,6 +29,7 @@ const useAuthStore = create((set) => ({
         loading: false,
         user: null,
         isAuthenticated: false,
+        isRestoring: false,
       });
 
       throw error;
@@ -34,7 +37,7 @@ const useAuthStore = create((set) => ({
   },
 
   getCurrentUser: async () => {
-    set({ loading: true });
+    set({ loading: true, isRestoring: true });
 
     try {
       const response = await api.get("/users/me");
@@ -45,6 +48,7 @@ const useAuthStore = create((set) => ({
         user,
         isAuthenticated: true,
         loading: false,
+        isRestoring: false,
       });
 
       return user;
@@ -53,6 +57,7 @@ const useAuthStore = create((set) => ({
         user: null,
         isAuthenticated: false,
         loading: false,
+        isRestoring: false,
       });
 
       throw error;

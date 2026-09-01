@@ -67,7 +67,7 @@ const getMyPods = asyncHandler(async (req, res) => {
 
   const pods = await Pod.find({
     members: userId,
-  });
+  }).populate("members", "username email avatar");
 
   return res
     .status(200)
