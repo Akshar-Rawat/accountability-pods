@@ -6,6 +6,10 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { getTodayInTimezone } from "../utils/dateUtils.js";
 import { calculateStreak } from "../services/streak.service.js";
+import { getSocketIO } from "../utils/socket.js";
+import Message from "../models/message.model.js";
+import { sendPodWaitingNudge } from "../services/nudgeCron.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const createCheckIn = asyncHandler(async (req, res) => {
   const { podId } = req.params;
@@ -81,6 +85,38 @@ await Streak.findOneAndUpdate(
     upsert: true,
   }
 );
+
+  const io = getSocketIO();
+  if (io) {
+    const roomName = `pod:${podId}`;
+
+    const messageText = photoUrl
+      ? `🔥 ${req.user.username} checked in today with proof`
+      : `🔥 ${req.user.username} checked in today`;
+
+    const systemMessage = await Message.create({
+      pod: podId,
+      user: userId,
+      text: messageText,
+      type: "system",
+      photoUrl: photoUrl || null,
+    });
+
+    const populatedSystemMessage = await Message.findById(systemMessage._id).populate(
+      "user",
+      "username avatar"
+    );
+
+    io.to(roomName).emit("member_checked_in", {
+      userId,
+      username: req.user.username,
+      streak: { currentStreak, longestStreak, lastCheckInDate },
+      systemMessage: populatedSystemMessage,
+    });
+  }
+
+  sendPodWaitingNudge(podId, userId);
+
   return res.status(201).json(
     new ApiResponse(
       201,
@@ -160,4 +196,32 @@ const getCheckInHistory = asyncHandler(async (req, res) => {
 
 
 
-export { createCheckIn, getTodaysCheckIns, getCheckInHistory };
+const uploadImage = asyncHandler(async (req, res) => {
+  if (
+    !process.env.CLOUDINARY_CLOUD_NAME ||
+    !process.env.CLOUDINARY_API_KEY ||
+    !process.env.CLOUDINARY_API_SECRET
+  ) {
+    throw new ApiError(503, "Photo uploads are not configured on this server");
+  }
+
+  if (!req.file) {
+    throw new ApiError(400, "An image file is required");
+  }
+
+  if (!req.file.mimetype.startsWith("image/")) {
+    throw new ApiError(400, "Only image uploads are allowed");
+  }
+
+  const result = await uploadOnCloudinary(req.file.path);
+
+  if (!result) {
+    throw new ApiError(500, "Failed to upload image");
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, { url: result.secure_url }, "Image uploaded successfully")
+  );
+});
+
+export { createCheckIn, getTodaysCheckIns, getCheckInHistory, uploadImage };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -10,7 +10,8 @@ import {
 import usePodStore from "../stores/podStore";
 import useAuthStore from "../stores/authStore";
 import CheckInModal from "../components/CheckInModal";
-import StreakBadge from "../components/StreakBadge";
+import ChatPanel from "../components/ChatPanel";
+import NotificationSettings from "../components/NotificationSettings";
 
 const PodDetailsPage = () => {
   const { id } = useParams();
@@ -50,9 +51,13 @@ const PodDetailsPage = () => {
     (c) => c.user?._id === user?._id || c.user === user?._id
   );
 
-  const handleCheckInSubmit = async ({ note }) => {
-    await checkIn(id, note);
-    setIsModalOpen(false);
+  const handleCheckInSubmit = async ({ note, photoUrl }) => {
+    try {
+      await checkIn(id, note, photoUrl);
+      setIsModalOpen(false);
+    } catch {
+      // The store exposes the request failure in its error state.
+    }
   };
 
   const handleLeavePod = async () => {
@@ -205,7 +210,7 @@ const PodDetailsPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {(podStreaks?.length > 0 ? podStreaks : currentPod.members?.map(m => ({ user: m, currentStreak: 0, longestStreak: 0 }))).map((streak, index) => {
+                {((podStreaks?.length ?? 0) > 0 ? podStreaks : (currentPod.members || []).map(m => ({ user: m, currentStreak: 0, longestStreak: 0 }))).map((streak, index) => {
                   const member = streak.user;
                   if (!member) return null;
                   const isCheckedInToday = todaysCheckIns?.some(
@@ -275,6 +280,16 @@ const PodDetailsPage = () => {
            >
              Leave Pod
            </button>
+        </div>
+
+        {/* Chat Section */}
+        <div className="mt-16">
+          <ChatPanel podId={id} currentUserId={user?._id} />
+        </div>
+
+        {/* Notification Settings */}
+        <div className="mt-8">
+          <NotificationSettings />
         </div>
 
       </div>

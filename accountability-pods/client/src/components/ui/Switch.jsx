@@ -1,11 +1,10 @@
-import React, { forwardRef, useId } from "react";
+import { forwardRef, useId } from "react";
 import { cn } from "../../lib/utils";
 
 const Switch = forwardRef(
   (
     {
       checked,
-      defaultChecked,
       onChange,
       label,
       helperText,

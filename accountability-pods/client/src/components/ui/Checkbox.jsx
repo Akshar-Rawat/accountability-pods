@@ -1,4 +1,4 @@
-import React, { forwardRef, useId, useState } from "react";
+import { forwardRef, useId, useState } from "react";
 import { Check } from "lucide-react";
 import { cn } from "../../lib/utils";
 

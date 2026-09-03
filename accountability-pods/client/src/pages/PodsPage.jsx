@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Plus, Flame } from "lucide-react";
 
@@ -45,14 +45,6 @@ const PodsPage = () => {
       fetchStreakForPod(pod._id);
     });
   }, [pods, fetchStreakForPod]);
-
-  const frequencyLabel = (freq) => {
-    if (freq === "daily") return "Every day";
-    if (freq === "weekdays") return "Weekdays";
-    if (freq === "monthly") return "Every month";
-    if (freq === "custom") return "Custom days";
-    return freq;
-  };
 
   return (
     <section className="min-h-[calc(100vh-4rem)] bg-surface">

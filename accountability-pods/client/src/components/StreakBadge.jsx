@@ -1,4 +1,3 @@
-import React from 'react';
 import { Flame } from 'lucide-react';
 
 const StreakBadge = ({ currentStreak, className = '' }) => {

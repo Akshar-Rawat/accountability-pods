@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { Bell, LogOut, Settings, User } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
+import logo from "../../../Logo/logo.png";
 
 import Avatar from "../ui/Avatar";
 import Button from "../ui/Button";
@@ -38,7 +39,7 @@ const Navbar = () => {
         {/* Logo */}
         <NavLink to="/" className="flex items-center" aria-label="Accountability Pods home">
           <img
-            src="../../../logo/logo.png"
+            src={logo}
             alt="Accountability Pods"
             className="h-16 w-24 object-contain"
           />

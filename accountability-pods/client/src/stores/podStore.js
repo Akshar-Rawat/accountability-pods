@@ -227,6 +227,23 @@ const usePodStore = create((set, get) => ({
       throw error;
     }
   },
+
+  handleMemberCheckedIn: (data) => {
+    const { userId, streak } = data;
+    set((state) => {
+      const updatedPodStreaks = state.podStreaks.map((s) => {
+        if (s.user._id === userId || s.user === userId) {
+          return { ...s, ...streak };
+        }
+        return s;
+      });
+
+      return {
+        podStreaks: updatedPodStreaks,
+        todaysCheckIns: [...state.todaysCheckIns, { user: { _id: userId } }],
+      };
+    });
+  },
 }));
 
 export default usePodStore;

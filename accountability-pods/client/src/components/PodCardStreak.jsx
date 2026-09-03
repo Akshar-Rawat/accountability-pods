@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import usePodStore from "../stores/podStore";
 import StreakBadge from "./StreakBadge";
 

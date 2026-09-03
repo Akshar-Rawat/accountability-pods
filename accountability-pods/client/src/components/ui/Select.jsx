@@ -1,4 +1,4 @@
-import React, { forwardRef, useId } from "react";
+import { forwardRef, useId } from "react";
 import { cn } from "../../lib/utils";
 
 const Select = forwardRef(
