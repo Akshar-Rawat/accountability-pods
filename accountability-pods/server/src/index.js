@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 import Pod from "./models/pods.model.js";
 import Message from "./models/message.model.js";
 import { setSocketIO } from "./utils/socket.js";
-// import { startNudgeCron } from "./services/nudgeCron.js";
+import { startNudgeCron } from "./services/nudgeCron.js";
 dotenv.config({
   path: "./.env",
   quiet: true,
@@ -122,7 +122,7 @@ connectDb()
     });
     server.listen(process.env.PORT || 5000, () => {
       console.log(`server is running at port ${process.env.PORT || 5000}`);
-      // startNudgeCron();
+      startNudgeCron();
     });
   })
   .catch((error) => {

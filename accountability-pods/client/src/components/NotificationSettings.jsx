@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bell, BellOff, Check } from "lucide-react";
 import api from "../lib/axios";
 
@@ -9,6 +9,24 @@ const NotificationSettings = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const loadSubscription = async () => {
+      if (!("serviceWorker" in navigator)) return;
+      const registration = await navigator.serviceWorker.getRegistration();
+      const subscription = await registration?.pushManager.getSubscription();
+      setIsSubscribed(Boolean(subscription));
+    };
+
+    loadSubscription().catch(() => setError("Unable to read notification settings"));
+  }, []);
+
+  const urlBase64ToUint8Array = (base64String) => {
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+    const rawData = window.atob(base64);
+    return Uint8Array.from(rawData, (character) => character.charCodeAt(0));
+  };
 
   const requestPermission = async () => {
     if (!("Notification" in window)) {
@@ -41,7 +59,6 @@ const NotificationSettings = () => {
       }
 
       const registration = await navigator.serviceWorker.register("/sw.js");
-      console.log("Service worker registered");
 
       const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
       if (!vapidKey) {
@@ -50,14 +67,17 @@ const NotificationSettings = () => {
 
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: vapidKey,
+        applicationServerKey: urlBase64ToUint8Array(vapidKey),
       });
 
       await api.post("/notifications/subscribe", { subscription });
       setIsSubscribed(true);
-      console.log("Push subscription successful");
     } catch (err) {
-      setError("Failed to subscribe to push notifications");
+      setError(
+        err.message === "VAPID public key not configured"
+          ? "Notifications are not configured yet. Add VITE_VAPID_PUBLIC_KEY to client/.env."
+          : err.message || "Failed to subscribe to push notifications",
+      );
       console.error("Push subscription error:", err);
     }
   };

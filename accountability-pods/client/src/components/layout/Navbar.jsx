@@ -36,7 +36,6 @@ const Navbar = () => {
     <nav className="fixed z-50 h-16 w-full border-b border-outline-variant/80 bg-surface/90 shadow-sm backdrop-blur-md">
       <div className="mx-auto flex h-full w-full max-w-container items-center justify-between px-4">
 
-        {/* Logo */}
         <NavLink to="/" className="flex items-center" aria-label="Accountability Pods home">
           <img
             src={logo}
@@ -45,7 +44,6 @@ const Navbar = () => {
           />
         </NavLink>
 
-        {/* Navigation — only show My Pods when logged in */}
         <ul className="flex items-center gap-6">
           <li>
             <NavLink
@@ -77,21 +75,19 @@ const Navbar = () => {
           )}
         </ul>
 
-        {/* Right side */}
         <div className="flex items-center gap-2">
           {isAuthenticated ? (
             <>
-              {/* Notifications */}
               <Button
                 type="button"
                 variant="ghost"
+                onClick={() => navigate("/notifications")}
                 className="size-10 rounded-md text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface"
                 aria-label="Notifications"
               >
                 <Bell size={18} strokeWidth={1.8} />
               </Button>
 
-              {/* Profile dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger
                   onClick={() => setProfileOpen((prev) => !prev)}

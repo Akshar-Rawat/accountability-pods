@@ -12,30 +12,30 @@ const Footer = () => {
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-8">
-          <a
+          <Link
             className="text-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
-            href="#"
+            to="/privacy"
           >
             Privacy Policy
-          </a>
-          <a
+          </Link>
+          <Link
             className="text-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
-            href="#"
+            to="/terms"
           >
             Terms of Service
-          </a>
-          <a
+          </Link>
+          <Link
             className="text-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
-            href="#"
+            to="/contact"
           >
             Contact
-          </a>
-          <a
+          </Link>
+          <Link
             className="text-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
-            href="#"
+            to="/faq"
           >
             FAQ
-          </a>
+          </Link>
         </div>
       </div>
     </footer>
@@ -43,3 +43,4 @@ const Footer = () => {
 };
 
 export default Footer;
+import { Link } from "react-router-dom";
