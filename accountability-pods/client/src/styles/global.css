@@ -1,2 +1,75 @@
 @import "tailwindcss";
 @import "tokens.css";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-width: 320px;
+    background: var(--background);
+    color: var(--on-background);
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--secondary-fixed);
+    color: var(--on-secondary-fixed);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 3px;
+  }
+}
+
+@layer utilities {
+  @keyframes pods-enter {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pods-orbit {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .animate-pods-enter {
+    animation: pods-enter 560ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) both;
+  }
+
+  .animate-pods-enter-1 { animation-delay: 70ms; }
+  .animate-pods-enter-2 { animation-delay: 140ms; }
+  .animate-pods-enter-3 { animation-delay: 210ms; }
+
+  .animate-pods-orbit {
+    animation: pods-orbit 18s linear infinite;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .interactive-lift {
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    }
+
+    .interactive-lift:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px rgb(25 28 31 / 12%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-pods-enter {
+      animation: pods-enter 200ms ease both;
+    }
+
+    .animate-pods-orbit {
+      animation: none;
+    }
+
+    *, *::before, *::after {
+      scroll-behavior: auto !important;
+    }
+  }
+}

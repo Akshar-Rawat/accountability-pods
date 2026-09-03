@@ -53,7 +53,7 @@ const LoginPage = () => {
             Back to home
           </Link>
 
-          <div className="rounded-xl border border-outline-variant bg-surface p-6">
+          <div className="rounded-2xl border border-outline-variant bg-surface p-7 shadow-xl shadow-primary/5 md:p-8">
             <div className="mb-7">
               <p className="text-label-caps font-semibold text-secondary">
                 WELCOME BACK
@@ -87,7 +87,7 @@ const LoginPage = () => {
                     placeholder="you@example.com"
                     autoComplete="email"
                     required
-                    className="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2.5 text-body-sm text-on-surface outline-none placeholder:text-on-surface-variant focus:border-primary focus:ring-1 focus:ring-primary"
+                    className="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2.5 text-body-sm text-on-surface outline-none placeholder:text-on-surface-variant transition-shadow focus:border-primary focus:ring-2 focus:ring-secondary/20"
                   />
                 </div>
 
@@ -109,7 +109,7 @@ const LoginPage = () => {
                       placeholder="Enter your password"
                       autoComplete="current-password"
                       required
-                      className="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2.5 pr-11 text-body-sm text-on-surface outline-none placeholder:text-on-surface-variant focus:border-primary focus:ring-1 focus:ring-primary"
+                      className="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2.5 pr-11 text-body-sm text-on-surface outline-none placeholder:text-on-surface-variant transition-shadow focus:border-primary focus:ring-2 focus:ring-secondary/20"
                     />
 
                     <button
@@ -145,7 +145,7 @@ const LoginPage = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full rounded-lg bg-primary px-5 py-3 text-body-sm font-semibold text-on-primary transition-colors hover:bg-primary-container disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full rounded-lg bg-primary px-5 py-3 text-body-sm font-semibold text-on-primary shadow-lg shadow-primary/15 transition-all hover:-translate-y-0.5 hover:bg-primary-container disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading ? "Logging in..." : "Log in"}
                 </button>

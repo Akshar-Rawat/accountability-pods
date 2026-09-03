@@ -1,14 +1,14 @@
 
 const Footer = () => {
   return (
-    <footer className="bg-surface-container-lowest border-t border-outline-variant mt-auto">
+    <footer className="mt-auto border-t border-outline-variant bg-surface-container-lowest">
       <div className="flex flex-col md:flex-row justify-between items-center w-full px-5 py-12 md:px-16 max-w-container mx-auto">
         <div className="mb-8 md:mb-0">
-          <span className="text-headline-md text-headline-md font-bold text-primary">
+          <span className="text-headline-md font-bold tracking-tight text-primary">
             Pods
           </span>
           <p className="text-body-sm text-body-sm text-on-surface-variant mt-2">
-            © 2024 Pods. All rights reserved.
+            © 2026 Pods. Build consistency together.
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-8">

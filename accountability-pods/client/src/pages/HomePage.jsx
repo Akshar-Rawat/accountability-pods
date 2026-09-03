@@ -33,41 +33,43 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="bg-surface text-on-surface">
-      <section className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-container items-center gap-10 px-5 py-14 md:grid-cols-2 md:px-16 md:py-20">
+    <div className="overflow-hidden bg-surface text-on-surface">
+      <section className="relative mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-container items-center gap-12 px-5 py-14 md:grid-cols-2 md:px-16 md:py-20">
+        <div className="pointer-events-none absolute -left-32 top-16 size-72 rounded-full bg-secondary-fixed/30 blur-3xl" />
         <div className="max-w-xl">
-          <p className="mb-3 text-body-sm font-medium text-secondary">
+          <p className="animate-pods-enter mb-4 inline-flex rounded-full bg-secondary-container px-3 py-1.5 text-label-caps font-semibold text-on-secondary-container">
             ACCOUNTABILITY PODS
           </p>
 
-          <h1 className="text-headline-xl font-semibold leading-tight text-primary">
-            Accountability, together.
+          <h1 className="animate-pods-enter animate-pods-enter-1 text-headline-xl text-5xl font-semibold leading-[1.04] tracking-[-0.05em] text-primary md:text-6xl">
+            Build momentum.<br />Together.
           </h1>
 
-          <p className="mt-4 max-w-lg text-body-lg text-on-surface-variant">
+          <p className="animate-pods-enter animate-pods-enter-2 mt-5 max-w-lg text-body-lg leading-7 text-on-surface-variant">
             Join focused pods to build better habits, stay consistent, and
             make progress together.
           </p>
 
-          <div className="mt-6 flex gap-3">
+          <div className="animate-pods-enter animate-pods-enter-3 mt-8 flex flex-wrap gap-3">
             <Link
               to="/pods"
-              className="rounded-lg bg-secondary-container px-6 py-3 text-body-sm font-semibold text-on-secondary-container hover:bg-secondary hover:text-on-secondary"
+              className="rounded-lg bg-primary px-6 py-3 text-body-sm font-semibold text-on-primary shadow-lg shadow-primary/15 transition-all hover:-translate-y-0.5 hover:bg-primary-container hover:shadow-xl"
             >
               Get Started
             </Link>
 
             <a
               href="#how-it-works"
-              className="rounded-lg border border-outline-variant px-6 py-3 text-body-sm font-semibold text-primary hover:bg-surface-container-low"
+              className="rounded-lg border border-outline-variant bg-surface/70 px-6 py-3 text-body-sm font-semibold text-primary transition-colors hover:bg-surface-container-low"
             >
               See how it works
             </a>
           </div>
         </div>
 
-        <div className="relative flex aspect-square items-center justify-center rounded-2xl border border-outline-variant bg-surface-container-low p-8">
-          <div className="relative h-64 w-64 rounded-full border border-outline-variant">
+        <div className="animate-pods-enter animate-pods-enter-2 relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl border border-outline-variant bg-gradient-to-br from-surface-container-lowest to-secondary-fixed/35 p-8 shadow-2xl shadow-primary/10">
+          <div className="animate-pods-orbit absolute -right-12 -top-12 size-40 rounded-full border-[24px] border-secondary/20" />
+          <div className="relative h-64 w-64 rounded-full border border-outline-variant bg-surface/40 shadow-inner">
             <div className="absolute inset-10 rounded-full border border-outline-variant" />
 
             <div className="absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-secondary" />
@@ -117,7 +119,7 @@ const HomePage = () => {
             return (
               <div
                 key={step.number}
-                className="border-t border-outline-variant pt-5"
+                className="interactive-lift rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-label-caps font-semibold text-secondary">
@@ -157,7 +159,7 @@ const HomePage = () => {
             </p>
           </div>
 
-          <div className="rounded-xl border border-outline-variant bg-surface p-6">
+          <div className="rounded-2xl border border-outline-variant bg-surface p-7 shadow-lg shadow-primary/5">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-label-caps text-on-surface-variant">
@@ -190,7 +192,7 @@ const HomePage = () => {
       </section>
 
       <section className="mx-auto grid max-w-container items-center gap-10 px-5 py-16 md:grid-cols-2 md:px-16 md:py-20">
-        <div className="order-2 rounded-xl border border-outline-variant bg-surface-container-lowest p-6 md:order-1">
+        <div className="order-2 rounded-2xl border border-outline-variant bg-surface-container-lowest p-7 shadow-lg shadow-primary/5 md:order-1">
           <div className="space-y-4">
             <div className="flex gap-3">
               <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm text-on-primary">
@@ -261,7 +263,7 @@ const HomePage = () => {
 
         <Link
           to="/pods"
-          className="mt-6 inline-flex rounded-lg bg-primary px-7 py-3 text-label-caps font-semibold text-on-primary hover:bg-primary-container"
+          className="mt-6 inline-flex rounded-lg bg-primary px-7 py-3 text-label-caps font-semibold text-on-primary shadow-lg shadow-primary/15 transition-all hover:-translate-y-0.5 hover:bg-primary-container"
         >
           GET STARTED
         </Link>

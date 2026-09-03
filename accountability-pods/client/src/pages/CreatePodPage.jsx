@@ -114,7 +114,7 @@ const CreatePodPage = () => {
 
           <form
             onSubmit={handleSubmit}
-            className="rounded-xl border border-outline-variant bg-surface p-6"
+            className="rounded-2xl border border-outline-variant bg-surface p-7 shadow-xl shadow-primary/5 md:p-8"
           >
             <div className="space-y-5">
               {/* Pod name */}
@@ -135,7 +135,7 @@ const CreatePodPage = () => {
                   onChange={handleChange}
                   placeholder="Morning Gym"
                   required
-                  className="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2.5 text-body-sm text-on-surface outline-none placeholder:text-on-surface-variant focus:border-primary focus:ring-1 focus:ring-primary"
+                  className="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2.5 text-body-sm text-on-surface outline-none placeholder:text-on-surface-variant transition-shadow focus:border-primary focus:ring-2 focus:ring-secondary/20"
                 />
               </div>
 
@@ -157,7 +157,7 @@ const CreatePodPage = () => {
                   placeholder="Write 500 words every day"
                   rows={3}
                   required
-                  className="w-full resize-none rounded-lg border border-outline-variant bg-surface px-3 py-2.5 text-body-sm text-on-surface outline-none placeholder:text-on-surface-variant focus:border-primary focus:ring-1 focus:ring-primary"
+                  className="w-full resize-none rounded-lg border border-outline-variant bg-surface px-3 py-2.5 text-body-sm text-on-surface outline-none placeholder:text-on-surface-variant transition-shadow focus:border-primary focus:ring-2 focus:ring-secondary/20"
                 />
               </div>
 
@@ -248,7 +248,7 @@ const CreatePodPage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-lg bg-primary px-5 py-3 text-body-sm font-semibold text-on-primary transition-colors hover:bg-primary-container disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full rounded-lg bg-primary px-5 py-3 text-body-sm font-semibold text-on-primary shadow-lg shadow-primary/15 transition-all hover:-translate-y-0.5 hover:bg-primary-container disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? "Creating..." : "Create Pod"}
               </button>

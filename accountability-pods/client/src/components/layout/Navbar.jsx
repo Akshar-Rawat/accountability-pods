@@ -33,7 +33,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed z-50 h-16 w-full border-b border-outline bg-surface-dim">
+    <nav className="fixed z-50 h-16 w-full border-b border-outline-variant/80 bg-surface/90 shadow-sm backdrop-blur-md">
       <div className="mx-auto flex h-full w-full max-w-container items-center justify-between px-4">
 
         {/* Logo */}
@@ -41,7 +41,7 @@ const Navbar = () => {
           <img
             src={logo}
             alt="Accountability Pods"
-            className="h-16 w-24 object-contain"
+            className="h-14 w-24 object-contain"
           />
         </NavLink>
 
@@ -67,7 +67,7 @@ const Navbar = () => {
                 to="/pods"
                 className={({ isActive }) =>
                   isActive
-                    ? "font-bold border-b-2 border-secondary px-3 py-2 text-body-sm text-secondary"
+                    ? "rounded-md bg-secondary-container px-3 py-2 font-semibold text-body-sm text-on-secondary-container"
                     : "px-3 py-2 text-body-sm text-on-surface-variant hover:text-on-surface"
                 }
               >
@@ -85,7 +85,7 @@ const Navbar = () => {
               <Button
                 type="button"
                 variant="ghost"
-                className="size-10 rounded-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+                className="size-10 rounded-md text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface"
                 aria-label="Notifications"
               >
                 <Bell size={18} strokeWidth={1.8} />
