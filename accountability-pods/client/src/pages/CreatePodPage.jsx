@@ -14,6 +14,7 @@ const CreatePodPage = () => {
     goal: "",
     frequency: "daily",
     customDays: [],
+    maxMembers: 5,
   });
 
   const [error, setError] = useState("");
@@ -71,6 +72,7 @@ const CreatePodPage = () => {
         goal: formData.goal.trim(),
         frequency: formData.frequency,
         customDays: formData.frequency === "custom" ? formData.customDays : [],
+        maxMembers: Number(formData.maxMembers),
       });
 
       navigate("/pods");
@@ -162,6 +164,14 @@ const CreatePodPage = () => {
               </div>
 
               {/* Frequency */}
+
+              <div>
+                <label htmlFor="maxMembers" className="mb-2 block text-body-sm font-medium text-primary">Maximum members</label>
+                <select id="maxMembers" name="maxMembers" value={formData.maxMembers} onChange={handleChange} className="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2.5 text-body-sm text-on-surface outline-none focus:border-primary focus:ring-2 focus:ring-secondary/20">
+                  {[2, 3, 4, 5, 6, 8, 10, 15, 20, 50, 100].map((size) => <option key={size} value={size}>{size} members</option>)}
+                </select>
+                <p className="mt-1 text-label-caps text-on-surface-variant">You are counted as the first member.</p>
+              </div>
 
               <fieldset>
                 <legend className="mb-3 text-body-sm font-medium text-primary">

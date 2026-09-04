@@ -9,23 +9,20 @@ cloudinary.config({
 });
 
 const uploadOnCloudinary = async (localFilePath) => {
+  if (!localFilePath) return null;
   try {
-    if (!localFilePath) return null;
-    //uploadon cloudinary
-    console.log("uploading file",localFilePath);
-    
     const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: "auto",
     });
-    //file uploaded
-    console.log("file uploaded onn cloudinary", response.url);
-    fs.unlinkSync(localFilePath);
     return response;
   } catch (error) {
-    if (localFilePath && fs.existsSync(localFilePath)) {
-      fs.unlinkSync(localFilePath);
-    }
     return null;
+  } finally {
+    try {
+      if (fs.existsSync(localFilePath)) fs.unlinkSync(localFilePath);
+    } catch (cleanupError) {
+      console.error("Failed to remove temporary upload:", cleanupError);
+    }
   }
 };
 

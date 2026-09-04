@@ -30,6 +30,18 @@ describe("Pod Routes", () => {
       expect(dbPod.members).toHaveLength(1);
       expect(dbPod.members[0].toString()).toBe(user._id.toString());
       expect(dbPod.inviteCode).toBeDefined();
+      expect(dbPod.maxMembers).toBe(5);
+    });
+
+    it("should save the creator-selected max members per pod", async () => {
+      const first = await createTestUser();
+      const second = await createTestUser();
+      const firstResponse = await request(app).post("/api/v1/pods").set("Authorization", `Bearer ${first.token}`).send({ name: "Small", goal: "Focus", frequency: "daily", maxMembers: 2 });
+      const secondResponse = await request(app).post("/api/v1/pods").set("Authorization", `Bearer ${second.token}`).send({ name: "Large", goal: "Focus", frequency: "daily", maxMembers: 10 });
+      expect(firstResponse.status).toBe(201);
+      expect(secondResponse.status).toBe(201);
+      expect(firstResponse.body.data.maxMembers).toBe(2);
+      expect(secondResponse.body.data.maxMembers).toBe(10);
     });
 
     it("should reject creation if unauthenticated", async () => {
@@ -55,6 +67,14 @@ describe("Pod Routes", () => {
       expect(res.body.data).toHaveLength(1);
       expect(res.body.data[0]._id.toString()).toBe(pod._id.toString());
     });
+  });
+
+  it("should reject pod details access for a non-member", async () => {
+    const admin = await createTestUser();
+    const outsider = await createTestUser();
+    const pod = await createTestPod(admin.user._id);
+    const res = await request(app).get(`/api/v1/pods/${pod._id}`).set("Authorization", `Bearer ${outsider.token}`);
+    expect(res.status).toBe(403);
   });
 
   describe("POST /api/v1/pods/join/:inviteCode", () => {
@@ -89,7 +109,8 @@ describe("Pod Routes", () => {
 
     it("should reject joining when pod is full", async () => {
       const admin = await createTestUser();
-      const pod = await createTestPod(admin.user._id, { maxMembers: 1 });
+      const existingMember = await createTestUser();
+      const pod = await createTestPod(admin.user._id, { maxMembers: 2, members: [admin.user._id, existingMember.user._id] });
 
       const newMember = await createTestUser();
       const res = await request(app)

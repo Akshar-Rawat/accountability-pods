@@ -8,6 +8,7 @@ import webpush from "web-push";
 
 const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
+let vapidConfigured = false;
 
 if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
   webpush.setVapidDetails(
@@ -15,6 +16,7 @@ if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
     VAPID_PUBLIC_KEY,
     VAPID_PRIVATE_KEY
   );
+  vapidConfigured = true;
 }
 
 const isCheckInRequiredToday = (frequency, customDays, timezone) => {
@@ -39,13 +41,20 @@ const isCheckInRequiredToday = (frequency, customDays, timezone) => {
 const sendPushNotification = async (subscription, title, body) => {
   try {
     if (!subscription) return;
+    if (!vapidConfigured) {
+      throw new Error("Push notifications are not configured on the server");
+    }
 
     const payload = JSON.stringify({ title, body });
 
-    await webpush.sendNotification(subscription, payload);
+    await webpush.sendNotification(subscription, payload, {
+      TTL: 60,
+      urgency: "high",
+    });
     console.log(`Push notification sent to user`);
   } catch (error) {
     console.error("Failed to send push notification:", error);
+    throw error;
   }
 };
 
@@ -156,4 +165,4 @@ export const startNudgeCron = () => {
   console.log("Nudge cron job started (runs every hour)");
 };
 
-export { sendReminderNudges, sendPodWaitingNudge };
+export { sendReminderNudges, sendPodWaitingNudge, sendPushNotification };

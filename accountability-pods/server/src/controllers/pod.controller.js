@@ -29,7 +29,7 @@ const validateCustomDays = (frequency, customDays) => {
 };
 
 const createPod = asyncHandler(async (req, res) => {
-  const { name, goal, frequency, customDays } = req.body;
+  const { name, goal, frequency, customDays, maxMembers = 5 } = req.body;
 
   const adminId = req.user._id;
 
@@ -41,6 +41,10 @@ const createPod = asyncHandler(async (req, res) => {
 
   if (!allowedFrequencies.includes(frequency)) {
     throw new ApiError(400, "Invalid frequency");
+  }
+
+  if (!Number.isInteger(Number(maxMembers)) || Number(maxMembers) < 2 || Number(maxMembers) > 100) {
+    throw new ApiError(400, "Max members must be a whole number between 2 and 100");
   }
 
   const normalizedCustomDays = validateCustomDays(frequency, customDays);
@@ -55,6 +59,7 @@ const createPod = asyncHandler(async (req, res) => {
     members: [adminId],
     admin: adminId,
     inviteCode,
+    maxMembers: Number(maxMembers),
   });
 
   return res
@@ -83,6 +88,10 @@ const getPodById = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Pod not found");
   }
 
+  if (!pod.members.some((member) => member.equals(req.user._id))) {
+    throw new ApiError(403, "You are not a member of this pod");
+  }
+
   const populatedPod = await pod.populate("members", "username email avatar");
 
   return res
@@ -106,17 +115,23 @@ const joinPod = asyncHandler(async (req, res) => {
     throw new ApiError(400, "User is already a member of this pod");
   }
 
-  if (pod.members.length >= pod.maxMembers) {
-    throw new ApiError(400, "Pod is full");
+  const updatedPod = await Pod.findOneAndUpdate(
+    {
+      _id: pod._id,
+      members: { $ne: userId },
+      $expr: { $lt: [{ $size: "$members" }, "$maxMembers"] },
+    },
+    { $addToSet: { members: userId } },
+    { returnDocument: "after" },
+  );
+
+  if (!updatedPod) {
+    throw new ApiError(400, pod.members.length >= pod.maxMembers ? "Pod is full" : "User is already a member of this pod");
   }
-
-  pod.members.push(userId);
-
-  await pod.save();
 
   return res
     .status(200)
-    .json(new ApiResponse(200, pod, "Joined pod successfully"));
+    .json(new ApiResponse(200, updatedPod, "Joined pod successfully"));
 });
 
 const leavePod = asyncHandler(async (req, res) => {
@@ -217,14 +232,17 @@ const updatePod = asyncHandler(async (req, res) => {
   }
 
   if (maxMembers !== undefined) {
-    if (maxMembers < pod.members.length) {
+    if (!Number.isInteger(Number(maxMembers)) || Number(maxMembers) < 2 || Number(maxMembers) > 100) {
+      throw new ApiError(400, "Max members must be a whole number between 2 and 100");
+    }
+    if (Number(maxMembers) < pod.members.length) {
       throw new ApiError(
         400,
         "Max members cannot be less than current members",
       );
     }
 
-    pod.maxMembers = maxMembers;
+    pod.maxMembers = Number(maxMembers);
   }
 
   await pod.save();

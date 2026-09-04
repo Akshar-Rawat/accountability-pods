@@ -6,6 +6,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { cookieOptions } from "../utils/cookieOptions.js";
+import fs from "node:fs";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -38,6 +39,7 @@ const registerUser = asyncHandler(async (req, res) => {
   if (
     [username, email, password, timezone].some((field) => !field || String(field).trim() === "")
   ) {
+    if (req.file?.path && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     throw new ApiError(400, "All fields requied");
   }
 

@@ -60,7 +60,7 @@ const LoginPage = () => {
               </p>
 
               <h1 className="mt-2 text-headline-lg font-semibold text-primary">
-                Log in to Pods
+                Log in to Pact
               </h1>
 
               <p className="mt-2 text-body-sm text-on-surface-variant">

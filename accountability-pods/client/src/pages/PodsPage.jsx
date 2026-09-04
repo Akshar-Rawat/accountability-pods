@@ -119,6 +119,13 @@ const PodsPage = () => {
           </div>
         )}
 
+        {!loading && !error && pods.length === 0 && (
+          <div className="mb-8 rounded-2xl border border-dashed border-outline-variant bg-surface-container-lowest p-10 text-center">
+            <h2 className="text-headline-md font-semibold text-primary">Your first pod starts here.</h2>
+            <p className="mx-auto mt-2 max-w-md text-body-md text-on-surface-variant">Create a focused group or join one with an invite code to start building momentum together.</p>
+          </div>
+        )}
+
         {!loading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Create New Pod Card */}
@@ -161,6 +168,7 @@ const PodsPage = () => {
                     <p className="text-body-sm text-body-sm text-on-surface-variant mb-6">
                       {pod.goal}
                     </p>
+                    <p className="mb-6 text-label-caps text-on-surface-variant">{pod.members?.length || 0} / {pod.maxMembers || 5} MEMBERS</p>
                     <div className="flex -space-x-3 mb-8">
                       {pod.members?.slice(0, 3).map((member) => (
                         <div key={member._id} className="h-8 w-8 rounded-full border-2 border-surface-container-lowest overflow-hidden">

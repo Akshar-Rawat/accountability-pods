@@ -74,6 +74,18 @@ const useAuthStore = create((set) => ({
       });
     }
   },
+
+  updateAccount: async (details) => {
+    set({ loading: true });
+    try {
+      const response = await api.patch("/users/update-account", details);
+      set({ user: response.data.data, loading: false });
+      return response.data.data;
+    } catch (error) {
+      set({ loading: false });
+      throw error;
+    }
+  },
 }));
 
 export default useAuthStore;

@@ -53,6 +53,12 @@ const podSchema = new Schema(
     maxMembers: {
       type: Number,
       default: 5,
+      min: 2,
+      max: 100,
+      validate: {
+        validator: Number.isInteger,
+        message: "Max members must be a whole number",
+      },
     },
   },
   {

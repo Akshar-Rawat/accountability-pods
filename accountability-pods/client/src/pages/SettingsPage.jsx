@@ -1,0 +1,6 @@
+import { Link } from "react-router-dom";
+import NotificationSettings from "../components/NotificationSettings";
+import useAuthStore from "../stores/authStore";
+
+const SettingsPage = () => { const logout = useAuthStore((state) => state.logout); return <section className="min-h-[calc(100vh-4rem)] bg-background px-5 py-14 md:px-16 md:py-20"><div className="mx-auto max-w-3xl"><p className="text-label-caps font-semibold text-secondary">PREFERENCES</p><h1 className="mt-3 text-headline-xl font-semibold text-primary">Settings</h1><div className="mt-10 space-y-5"><div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6"><h2 className="text-headline-md font-semibold text-primary">Account</h2><Link to="/profile" className="mt-4 inline-flex rounded-lg border border-outline-variant px-4 py-2 text-body-sm font-semibold text-primary">Edit profile</Link></div><NotificationSettings /><div className="rounded-2xl border border-error/40 bg-surface-container-lowest p-6"><h2 className="text-headline-md font-semibold text-primary">Security</h2><button onClick={logout} className="mt-4 rounded-lg bg-error px-4 py-2 text-body-sm font-semibold text-on-error">Log out</button></div></div></div></section>; };
+export default SettingsPage;

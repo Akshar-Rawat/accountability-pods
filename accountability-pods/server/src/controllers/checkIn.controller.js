@@ -8,6 +8,7 @@ import { getTodayInTimezone } from "../utils/dateUtils.js";
 import { calculateStreak } from "../services/streak.service.js";
 import { getSocketIO } from "../utils/socket.js";
 import Message from "../models/message.model.js";
+import fs from "node:fs";
 import { sendPodWaitingNudge } from "../services/nudgeCron.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
@@ -87,25 +88,25 @@ await Streak.findOneAndUpdate(
 );
 
   const io = getSocketIO();
+  const messageText = photoUrl
+    ? `🔥 ${req.user.username} checked in today with proof`
+    : `🔥 ${req.user.username} checked in today`;
+  const noteText = typeof note === "string" ? note.trim() : "";
+  const chatText = noteText ? `${messageText}\n“${noteText}”` : messageText;
+  const systemMessage = await Message.create({
+    pod: podId,
+    user: userId,
+    text: chatText,
+    type: "system",
+    photoUrl: photoUrl || null,
+  });
+  const populatedSystemMessage = await Message.findById(systemMessage._id).populate(
+    "user",
+    "username avatar"
+  );
+
   if (io) {
     const roomName = `pod:${podId}`;
-
-    const messageText = photoUrl
-      ? `🔥 ${req.user.username} checked in today with proof`
-      : `🔥 ${req.user.username} checked in today`;
-
-    const systemMessage = await Message.create({
-      pod: podId,
-      user: userId,
-      text: messageText,
-      type: "system",
-      photoUrl: photoUrl || null,
-    });
-
-    const populatedSystemMessage = await Message.findById(systemMessage._id).populate(
-      "user",
-      "username avatar"
-    );
 
     io.to(roomName).emit("member_checked_in", {
       userId,
@@ -197,11 +198,16 @@ const getCheckInHistory = asyncHandler(async (req, res) => {
 
 
 const uploadImage = asyncHandler(async (req, res) => {
+  const cleanupInvalidUpload = () => {
+    if (req.file?.path && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+  };
+
   if (
     !process.env.CLOUDINARY_CLOUD_NAME ||
     !process.env.CLOUDINARY_API_KEY ||
     !process.env.CLOUDINARY_API_SECRET
   ) {
+    cleanupInvalidUpload();
     throw new ApiError(503, "Photo uploads are not configured on this server");
   }
 
@@ -210,18 +216,23 @@ const uploadImage = asyncHandler(async (req, res) => {
   }
 
   if (!req.file.mimetype.startsWith("image/")) {
+    cleanupInvalidUpload();
     throw new ApiError(400, "Only image uploads are allowed");
   }
 
-  const result = await uploadOnCloudinary(req.file.path);
+  try {
+    const result = await uploadOnCloudinary(req.file.path);
 
-  if (!result) {
-    throw new ApiError(500, "Failed to upload image");
+    if (!result) {
+      throw new ApiError(500, "Failed to upload image");
+    }
+
+    return res.status(200).json(
+      new ApiResponse(200, { url: result.secure_url }, "Image uploaded successfully")
+    );
+  } finally {
+    if (req.file?.path && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
   }
-
-  return res.status(200).json(
-    new ApiResponse(200, { url: result.secure_url }, "Image uploaded successfully")
-  );
 });
 
 export { createCheckIn, getTodaysCheckIns, getCheckInHistory, uploadImage };

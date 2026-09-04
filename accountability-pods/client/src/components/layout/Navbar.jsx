@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { Bell, LogOut } from "lucide-react";
-import logo from "../../../Logo/logo.png";
+import { Bell, LogOut,Settings,User } from "lucide-react";
+import BrandMark from "../BrandMark";
 
 import Avatar from "../ui/Avatar";
 import Button from "../ui/Button";
@@ -36,12 +36,8 @@ const Navbar = () => {
     <nav className="fixed z-50 h-16 w-full border-b border-outline-variant/80 bg-surface/90 shadow-sm backdrop-blur-md">
       <div className="mx-auto flex h-full w-full max-w-container items-center justify-between px-4">
 
-        <NavLink to="/" className="flex items-center" aria-label="Accountability Pods home">
-          <img
-            src={logo}
-            alt="Accountability Pods"
-            className="h-14 w-24 object-contain"
-          />
+        <NavLink to="/" className="flex items-center" aria-label="Pact home">
+          <BrandMark />
         </NavLink>
 
         <ul className="flex items-center gap-6">
@@ -110,6 +106,12 @@ const Navbar = () => {
                     onClick={handleLogout}
                   >
                     Logout
+                  </DropdownMenuItem>
+                  <DropdownMenuItem icon={User} onClick={() => navigate("/profile")}>
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem icon={Settings} onClick={() => navigate("/settings")}>
+                    Settings
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

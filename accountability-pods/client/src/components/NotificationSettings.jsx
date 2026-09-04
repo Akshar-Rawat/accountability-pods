@@ -9,6 +9,7 @@ const NotificationSettings = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [testSent, setTestSent] = useState(false);
 
   useEffect(() => {
     const loadSubscription = async () => {
@@ -25,7 +26,11 @@ const NotificationSettings = () => {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
     const rawData = window.atob(base64);
-    return Uint8Array.from(rawData, (character) => character.charCodeAt(0));
+    const bytes = Uint8Array.from(rawData, (character) => character.charCodeAt(0));
+    if (bytes.length !== 65 || bytes[0] !== 4) {
+      throw new Error("VAPID public key must be an uncompressed P-256 key");
+    }
+    return bytes.buffer;
   };
 
   const requestPermission = async () => {
@@ -58,11 +63,17 @@ const NotificationSettings = () => {
         throw new Error("Service workers are not supported");
       }
 
-      const registration = await navigator.serviceWorker.register("/sw.js");
+      await navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" });
+      const registration = await navigator.serviceWorker.ready;
 
       const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
       if (!vapidKey) {
         throw new Error("VAPID public key not configured");
+      }
+
+      const existingSubscription = await registration.pushManager.getSubscription();
+      if (existingSubscription) {
+        await existingSubscription.unsubscribe();
       }
 
       const subscription = await registration.pushManager.subscribe({
@@ -76,9 +87,31 @@ const NotificationSettings = () => {
       setError(
         err.message === "VAPID public key not configured"
           ? "Notifications are not configured yet. Add VITE_VAPID_PUBLIC_KEY to client/.env."
+          : err.name === "AbortError"
+          ? "This browser's push service is unavailable or rejected the subscription. Try Chrome or Edge in a normal window (not an in-app/embedded browser), then allow notifications for localhost."
           : err.message || "Failed to subscribe to push notifications",
       );
       console.error("Push subscription error:", err);
+    }
+  };
+
+  const sendTestNotification = async () => {
+    setError(null);
+    setTestSent(false);
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      if (!subscription) {
+        setIsSubscribed(false);
+        throw new Error("Enable notifications first");
+      }
+      await api.post("/notifications/test", { subscription });
+      setTestSent(true);
+    } catch (err) {
+      if (err.response?.status === 400 && err.response?.data?.message?.toLowerCase().includes("expired")) {
+        setIsSubscribed(false);
+      }
+      setError(err.response?.data?.message || "Could not send test notification");
     }
   };
 
@@ -110,10 +143,7 @@ const NotificationSettings = () => {
         </div>
 
         {isSubscribed ? (
-          <div className="flex items-center gap-2 text-teal-600">
-            <Check size={18} />
-            <span className="text-body-sm font-medium">Active</span>
-          </div>
+          <div className="flex items-center gap-3"><button onClick={sendTestNotification} className="rounded-lg bg-secondary px-3 py-2 text-body-sm font-medium text-on-secondary">Send test</button><div className="flex items-center gap-2 text-teal-600"><Check size={18} /><span className="text-body-sm font-medium">Active</span></div></div>
         ) : permission === "granted" ? (
           <button
             onClick={subscribeToPush}
@@ -136,6 +166,7 @@ const NotificationSettings = () => {
       {error && (
         <p className="mt-3 text-body-sm text-error">{error}</p>
       )}
+      {testSent && <p className="mt-3 text-body-sm text-teal-700">Test notification sent.</p>}
     </div>
   );
 };

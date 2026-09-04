@@ -11,6 +11,8 @@ import LegalPage from "./pages/LegalPage";
 import ContactPage from "./pages/ContactPage";
 import FAQPage from "./pages/FAQPage";
 import NotificationsPage from "./pages/NotificationsPage";
+import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 import AppLayout from "./components/layout/AppLayout";
 import useAuthStore from "./stores/authStore";
 
@@ -64,6 +66,8 @@ const App = () => {
           path="/notifications"
           element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>}
         />
+        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
         <Route
           path="/pods/:id"

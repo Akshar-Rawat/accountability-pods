@@ -38,7 +38,7 @@ const HomePage = () => {
         <div className="pointer-events-none absolute -left-32 top-16 size-72 rounded-full bg-secondary-fixed/30 blur-3xl" />
         <div className="max-w-xl">
           <p className="animate-pods-enter mb-4 inline-flex rounded-full bg-secondary-container px-3 py-1.5 text-label-caps font-semibold text-on-secondary-container">
-            ACCOUNTABILITY PODS
+            PACT
           </p>
 
           <h1 className="animate-pods-enter animate-pods-enter-1 text-headline-xl text-5xl font-semibold leading-[1.04] tracking-[-0.05em] text-primary md:text-6xl">

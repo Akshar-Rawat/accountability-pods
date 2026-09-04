@@ -45,12 +45,18 @@ const ChatPanel = ({ podId, currentUserId }) => {
     };
 
     const handleNewMessage = (message) => {
-      setMessages((prev) => [...prev, message]);
+      setMessages((prev) => prev.some((item) => item._id === message._id)
+        ? prev
+        : [...prev, message]);
     };
 
     const handleMemberCheckedIn = (data) => {
       updateStreaks(data);
-      setMessages((prev) => [...prev, data.systemMessage]);
+      if (data.systemMessage) {
+        setMessages((prev) => prev.some((message) => message._id === data.systemMessage._id)
+          ? prev
+          : [...prev, data.systemMessage]);
+      }
     };
 
     const handleError = (error) => {
@@ -169,7 +175,7 @@ const ChatPanel = ({ podId, currentUserId }) => {
                 {isSystemMessage ? (
                   <div className="bg-surface-container-low px-4 py-3 rounded-full text-center">
                     <p className="text-body-sm text-on-surface-variant mb-2">
-                      {message.text}
+                      <span className="whitespace-pre-line">{message.text}</span>
                     </p>
                     {message.photoUrl && (
                       <img 
