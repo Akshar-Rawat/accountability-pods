@@ -2,7 +2,8 @@ const asyncHandler= (fn)=>async(req,res,next)=>{
 try {
     await fn(req,res,next)
 } catch (error) {
-    res.status(error.statusCode || error.code || 500).json({
+    const statusCode = error.statusCode || (error.code === 11000 ? 409 : 500);
+    res.status(statusCode).json({
         message:error.message,
         success:false
     })

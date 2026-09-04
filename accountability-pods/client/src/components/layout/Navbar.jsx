@@ -78,10 +78,11 @@ const Navbar = () => {
                 type="button"
                 variant="ghost"
                 onClick={() => navigate("/notifications")}
+                size={18}
                 className="size-10 rounded-md text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface"
                 aria-label="Notifications"
               >
-                <Bell size={18} strokeWidth={1.8} />
+                <Bell  strokeWidth={1.8} />
               </Button>
 
               <DropdownMenu>
