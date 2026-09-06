@@ -34,7 +34,7 @@ connectDb()
       const accessToken = cookie
         ?.split("; ")
         .find((cookie) => cookie.trim().startsWith("accessToken="))
-        ?.split("=")[1];
+        ?.split("=")[1] || socket.handshake.auth?.token;
       try {
         const decoded = jwt.verify(
           accessToken,

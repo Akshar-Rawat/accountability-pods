@@ -1,6 +1,7 @@
 
 import { create } from "zustand";
 import api from "../lib/axios";
+import { disconnectSocket } from "../services/socket";
 
 const useAuthStore = create((set) => ({
   user: null,
@@ -15,6 +16,7 @@ const useAuthStore = create((set) => ({
       const response = await api.post("/users/login", credentials);
 
       const user = response.data.data.user;
+      localStorage.setItem("accessToken", response.data.data.accessToken);
 
       set({
         user,
@@ -60,6 +62,8 @@ const useAuthStore = create((set) => ({
         isRestoring: false,
       });
 
+      localStorage.removeItem("accessToken");
+
       throw error;
     }
   },
@@ -68,6 +72,8 @@ const useAuthStore = create((set) => ({
     try {
       await api.post("/users/logout");
     } finally {
+      localStorage.removeItem("accessToken");
+      disconnectSocket();
       set({
         user: null,
         isAuthenticated: false,

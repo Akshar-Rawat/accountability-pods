@@ -161,7 +161,7 @@ describe("Streak Flow & Routes", () => {
       expect(res.body.data.lastCheckInDate).toBe("2026-01-01");
     });
 
-    it("should return 404 if no streak exists", async () => {
+    it("should return a zero-day streak if no streak exists", async () => {
       const { token, user } = await createTestUser();
 
       const pod = await createTestPod(user._id);
@@ -170,7 +170,12 @@ describe("Streak Flow & Routes", () => {
         .get(`/api/v1/pods/${pod._id}/streak`)
         .set("Authorization", `Bearer ${token}`);
 
-      expect(res.status).toBe(404);
+      expect(res.status).toBe(200);
+      expect(res.body.data).toMatchObject({
+        currentStreak: 0,
+        longestStreak: 0,
+        lastCheckInDate: null,
+      });
     });
 
     it("should return 403 if user is not a member", async () => {

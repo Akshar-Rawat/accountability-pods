@@ -18,7 +18,17 @@ const getStreak = asyncHandler(async (req, res) => {
   const streak = await Streak.findOne({ pod: podId, user: userId });
 
   if (!streak) {
-    throw new ApiError(404, "Streak not found");
+    // A member who has not checked in yet has a valid zero-day streak. This
+    // keeps the pod list from treating a normal first-use state as an error.
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { currentStreak: 0, longestStreak: 0, lastCheckInDate: null },
+          "No check-ins yet",
+        ),
+      );
   }
 
   return res
