@@ -18,14 +18,14 @@ const Button = forwardRef(
     ref,
   ) => {
     const baseClasses =
-      "inline-flex items-center justify-center gap-2 cursor-pointer transition-colors rounded-[var(--button-radius)] font-[var(--button-font-weight)] focus-visible:outline-[var(--button-focus-ring-width)] focus-visible:outline-offset-[var(--button-focus-ring-offset)] focus-visible:outline-outline disabled:cursor-not-allowed disabled:opacity-50";
+      "inline-flex items-center justify-center gap-2 cursor-pointer transition-transform duration-150 rounded-[var(--button-radius)] font-[var(--button-font-weight)] focus-visible:outline-[var(--button-focus-ring-width)] focus-visible:outline-offset-[var(--button-focus-ring-offset)] focus-visible:outline-secondary active:scale-[.97] disabled:cursor-not-allowed disabled:opacity-50";
 
     const variantClasses = {
       primary:
         "bg-primary text-on-primary hover:bg-primary-container active:bg-primary-container",
 
       secondary:
-        "bg-secondary-container text-on-secondary-container hover:bg-secondary active:bg-secondary",
+        "bg-surface-container-low text-on-surface hover:bg-surface-container-high active:bg-surface-container-high",
 
       outline:
         "bg-transparent border border-outline-variant text-primary hover:bg-surface-container-low active:bg-surface-container",

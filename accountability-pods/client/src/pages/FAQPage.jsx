@@ -12,9 +12,9 @@ const FAQPage = () => {
     <section className="min-h-[calc(100vh-4rem)] bg-background px-5 py-14 md:px-16 md:py-20">
       <div className="mx-auto max-w-3xl">
         <p className="text-label-caps font-semibold text-secondary">HELP CENTER</p>
-        <h1 className="mt-3 text-headline-xl font-semibold text-primary">Frequently asked questions</h1>
+        <h1 className="mt-3 max-w-2xl text-headline-xl font-medium tracking-[-.055em] text-primary">Frequently asked questions</h1>
         <p className="mt-3 text-body-lg text-on-surface-variant">Everything you need to get started and keep your pod moving.</p>
-        <div className="mt-10 shadow-lg shadow-primary/5"><Accordion items={items} defaultValue="pods" /></div>
+        <div className="mt-10 rounded-[15px] bg-surface-container-low shadow-lg shadow-black/20"><Accordion items={items} defaultValue="pods" /></div>
       </div>
     </section>
   );

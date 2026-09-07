@@ -116,10 +116,9 @@ const CreatePodPage = () => {
 
           <form
             onSubmit={handleSubmit}
-            className="rounded-2xl border border-outline-variant bg-surface p-7 shadow-xl shadow-primary/5 md:p-8"
+            className="rounded-[20px] border border-outline-variant bg-surface-container-low p-7 shadow-xl shadow-black/20 md:p-8"
           >
             <div className="space-y-5">
-              {/* Pod name */}
 
               <div>
                 <label
@@ -141,7 +140,6 @@ const CreatePodPage = () => {
                 />
               </div>
 
-              {/* Goal */}
 
               <div>
                 <label
@@ -163,7 +161,6 @@ const CreatePodPage = () => {
                 />
               </div>
 
-              {/* Frequency */}
 
               <div>
                 <label htmlFor="maxMembers" className="mb-2 block text-body-sm font-medium text-primary">Maximum members</label>
@@ -207,7 +204,6 @@ const CreatePodPage = () => {
                 </div>
               </fieldset>
 
-              {/* Custom days */}
 
               {formData.frequency === "custom" && (
                 <fieldset>
@@ -245,7 +241,6 @@ const CreatePodPage = () => {
                 </fieldset>
               )}
 
-              {/* Error */}
 
               {error && (
                 <p role="alert" className="text-body-sm text-error">
@@ -253,12 +248,11 @@ const CreatePodPage = () => {
                 </p>
               )}
 
-              {/* Submit */}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-lg bg-primary px-5 py-3 text-body-sm font-semibold text-on-primary shadow-lg shadow-primary/15 transition-all hover:-translate-y-0.5 hover:bg-primary-container disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full rounded-full bg-primary px-5 py-3 text-body-sm font-medium text-on-primary transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? "Creating..." : "Create Pod"}
               </button>

@@ -139,7 +139,7 @@ const ChatPanel = ({ podId, currentUserId }) => {
           <div className="flex items-center gap-2">
             <div
               className={`w-2 h-2 rounded-full ${
-                isConnected ? "bg-teal-600" : "bg-error"
+                isConnected ? "bg-[#22c55e]" : "bg-error"
               }`}
             ></div>
             <span className="text-label-caps text-on-surface-variant">
@@ -247,7 +247,7 @@ const ChatPanel = ({ podId, currentUserId }) => {
           <button
             type="submit"
             disabled={!newMessage.trim() || !isConnected}
-            className="rounded-lg bg-secondary px-4 py-2 text-body-sm font-medium text-on-secondary hover:bg-secondary-container disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="rounded-full bg-primary px-4 py-2 text-body-sm font-medium text-on-primary hover:bg-primary-container disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <Send size={18} />
           </button>

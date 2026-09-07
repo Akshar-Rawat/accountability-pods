@@ -56,7 +56,7 @@ const PodDetailsPage = () => {
       await checkIn(id, note, photoUrl);
       setIsModalOpen(false);
     } catch {
-      // The store exposes the request failure in its error state.
+      return;
     }
   };
 
@@ -118,7 +118,6 @@ const PodDetailsPage = () => {
     <section className="min-h-[calc(100vh-4rem)] bg-background">
       <div className="mx-auto w-full max-w-4xl px-5 py-8 md:px-16">
         
-        {/* Top Header */}
         <div className="flex items-center justify-between mb-16">
           <Link
             to="/pods"
@@ -132,7 +131,6 @@ const PodDetailsPage = () => {
           </div>
         </div>
 
-        {/* Center Title */}
         <div className="text-center mb-12">
           <p className="text-label-caps font-semibold text-secondary uppercase tracking-widest mb-4">
             {currentPod.frequency} ACCOUNTABILITY
@@ -142,42 +140,42 @@ const PodDetailsPage = () => {
           </h1>
         </div>
 
-        {/* Huge Check-In Button */}
         <div className="flex justify-center mb-24">
           <button
             onClick={() => !hasCheckedInToday && setIsModalOpen(true)}
             disabled={hasCheckedInToday}
-            className={`relative flex flex-col items-center justify-center w-64 h-64 rounded-full transition-all duration-300 ${
+            aria-label={hasCheckedInToday ? "Checked in today" : "Check in for today's target"}
+            className={`group relative flex size-72 flex-col items-center justify-center rounded-full p-[1px] transition-all duration-300 focus-visible:outline-secondary focus-visible:outline-offset-4 ${
               hasCheckedInToday
-                ? "bg-surface-container border-2 border-outline-variant cursor-default"
-                : "bg-[#8B5A2B] hover:bg-[#734A23] shadow-lg hover:shadow-xl hover:scale-105"
+                ? "cursor-default bg-outline-variant"
+                : "bg-[conic-gradient(from_210deg,#0099ff,#0099ff55,#262626,#0099ff)] shadow-[0_0_60px_rgba(0,153,255,.12)] hover:scale-[1.025] hover:shadow-[0_0_80px_rgba(0,153,255,.18)]"
             }`}
           >
+            <span className={`absolute inset-[10px] rounded-full border ${hasCheckedInToday ? "border-outline-variant" : "border-white/15"}`} />
+            <span className={`absolute inset-[28px] rounded-full border ${hasCheckedInToday ? "border-outline-variant" : "border-white/10 group-hover:border-white/25"} transition-colors`} />
+            <span className="absolute inset-[47px] rounded-full bg-surface-container-low" />
             {hasCheckedInToday ? (
-              <>
-                <CheckCircle size={48} className="text-on-surface-variant mb-2 opacity-50" />
-                <span className="text-xl font-medium text-on-surface-variant opacity-80">Checked In</span>
-              </>
+              <span className="relative z-10 flex flex-col items-center">
+                <span className="mb-3 flex size-12 items-center justify-center rounded-full bg-[#22c55e]/15 text-[#22c55e]"><CheckCircle size={25} /></span>
+                <span className="text-xl font-medium tracking-[-.04em] text-primary">Checked in</span>
+                <span className="mt-1 text-[11px] font-medium uppercase tracking-[.12em] text-on-surface-variant">Come back tomorrow</span>
+              </span>
             ) : (
-              <>
-                <div className="absolute inset-0 rounded-full border-4 border-white/20 scale-75"></div>
-                <div className="absolute inset-0 rounded-full border-2 border-white/40 scale-50"></div>
-                <span className="text-2xl font-medium text-white mb-2 z-10">Check In</span>
-                <span className="text-[10px] font-bold tracking-widest text-white/70 uppercase z-10">
-                  Today's Target
-                </span>
-              </>
+              <span className="relative z-10 flex flex-col items-center">
+                <span className="mb-4 flex size-10 items-center justify-center rounded-full bg-primary text-on-primary transition-transform group-hover:scale-110"><CheckCircle size={19} /></span>
+                <span className="text-2xl font-medium tracking-[-.05em] text-primary">Check in</span>
+                <span className="mt-1 text-[11px] font-medium uppercase tracking-[.12em] text-on-surface-variant">Today’s target</span>
+              </span>
             )}
           </button>
         </div>
 
-        {/* Current Streak Display */}
         <div className="flex justify-center mb-16">
           <div className="rounded-2xl border border-outline-variant bg-surface-container p-6 text-center">
             <div className="flex items-center justify-center gap-3 mb-2">
               <Flame 
                 size={32} 
-                className={myCurrentStreak?.currentStreak > 0 ? "text-amber-500" : "text-on-surface-variant opacity-40"}
+                className={myCurrentStreak?.currentStreak > 0 ? "text-primary" : "text-on-surface-variant opacity-40"}
               />
               <span className="text-4xl font-bold text-primary">
                 {myCurrentStreak?.currentStreak ?? 0}
@@ -192,7 +190,6 @@ const PodDetailsPage = () => {
           </div>
         </div>
 
-        {/* Pod Leaderboard */}
         <div>
           <div className="flex items-center justify-between border-b border-outline-variant pb-4 mb-4">
             <h2 className="text-2xl font-semibold text-primary tracking-tight">Pod Leaderboard</h2>
@@ -242,7 +239,7 @@ const PodDetailsPage = () => {
                         <div className="w-48">
                           <div className="h-1 w-full bg-surface-container rounded-full overflow-hidden mb-1">
                             <div 
-                              className="h-full bg-amber-500 rounded-full" 
+                              className="h-full bg-primary rounded-full" 
                               style={{ width: `${Math.min((streak.currentStreak / 31) * 100, 100)}%` }}
                             />
                           </div>
@@ -255,7 +252,7 @@ const PodDetailsPage = () => {
                       <td className="py-4 px-2 text-center align-middle">
                         <div className="flex justify-center">
                           {isCheckedInToday ? (
-                            <CheckCircle size={18} className="text-teal-600" />
+                            <CheckCircle size={18} className="text-[#22c55e]" />
                           ) : (
                             <MoreHorizontal size={18} className="text-on-surface-variant opacity-50" />
                           )}
@@ -269,7 +266,6 @@ const PodDetailsPage = () => {
           </div>
         </div>
 
-        {/* Leave Pod & Extra Info */}
         <div className="mt-16 flex flex-col items-center justify-center gap-4 border-t border-outline-variant pt-8">
            <p className="text-body-sm text-on-surface-variant">
              Invite Code: <span className="font-mono font-bold text-primary">{currentPod.inviteCode}</span>
@@ -282,12 +278,10 @@ const PodDetailsPage = () => {
            </button>
         </div>
 
-        {/* Chat Section */}
         <div className="mt-16">
           <ChatPanel podId={id} currentUserId={user?._id} />
         </div>
 
-        {/* Notification Settings */}
         <div className="mt-8">
           <NotificationSettings />
         </div>

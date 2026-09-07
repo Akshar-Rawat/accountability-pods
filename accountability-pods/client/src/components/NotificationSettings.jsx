@@ -143,12 +143,12 @@ const NotificationSettings = () => {
         </div>
 
         {isSubscribed ? (
-          <div className="flex items-center gap-3"><button onClick={sendTestNotification} className="rounded-lg bg-secondary px-3 py-2 text-body-sm font-medium text-on-secondary">Send test</button><div className="flex items-center gap-2 text-teal-600"><Check size={18} /><span className="text-body-sm font-medium">Active</span></div></div>
+          <div className="flex items-center gap-3"><button onClick={sendTestNotification} className="rounded-full bg-primary px-3 py-2 text-body-sm font-medium text-on-primary">Send test</button><div className="flex items-center gap-2 text-[#22c55e]"><Check size={18} /><span className="text-body-sm font-medium">Active</span></div></div>
         ) : permission === "granted" ? (
           <button
             onClick={subscribeToPush}
             disabled={loading}
-            className="rounded-lg bg-secondary px-4 py-2 text-body-sm font-medium text-on-secondary hover:bg-secondary-container disabled:opacity-50 transition-colors"
+            className="rounded-full bg-primary px-4 py-2 text-body-sm font-medium text-on-primary hover:bg-primary-container disabled:opacity-50 transition-colors"
           >
             {loading ? "Enabling..." : "Enable Reminders"}
           </button>
@@ -156,7 +156,7 @@ const NotificationSettings = () => {
           <button
             onClick={requestPermission}
             disabled={loading}
-            className="rounded-lg bg-secondary px-4 py-2 text-body-sm font-medium text-on-secondary hover:bg-secondary-container disabled:opacity-50 transition-colors"
+            className="rounded-full bg-primary px-4 py-2 text-body-sm font-medium text-on-primary hover:bg-primary-container disabled:opacity-50 transition-colors"
           >
             {loading ? "Requesting..." : "Enable Notifications"}
           </button>
@@ -166,7 +166,7 @@ const NotificationSettings = () => {
       {error && (
         <p className="mt-3 text-body-sm text-error">{error}</p>
       )}
-      {testSent && <p className="mt-3 text-body-sm text-teal-700">Test notification sent.</p>}
+      {testSent && <p className="mt-3 text-body-sm text-[#22c55e]">Test notification sent.</p>}
     </div>
   );
 };

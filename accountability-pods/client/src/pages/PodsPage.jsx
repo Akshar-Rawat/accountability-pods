@@ -39,7 +39,6 @@ const PodsPage = () => {
     getMyPods().catch(() => {});
   }, [getMyPods]);
 
-  // Once pods load, fire off a streak fetch per pod (cached — won't re-fetch if already loaded)
   useEffect(() => {
     pods.forEach((pod) => {
       fetchStreakForPod(pod._id);
@@ -50,15 +49,13 @@ const PodsPage = () => {
     <section className="min-h-[calc(100vh-4rem)] bg-surface">
       <div className="mx-auto w-full max-w-container px-5 py-12 md:py-16 md:px-16">
 
-        {/* Header Section */}
         <section className="mb-12">
-          <h1 className="text-headline-xl text-headline-xl text-primary mb-2">Your Pods</h1>
+          <h1 className="text-headline-xl text-headline-xl text-primary mb-2">Your Pacts</h1>
           <p className="text-body-lg text-body-lg text-on-surface-variant max-w-2xl">
             Focus on discipline. Stay consistent with your groups.
           </p>
         </section>
 
-        {/* Join pod with invite code */}
         <form
           onSubmit={handleJoin}
           className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-start"
@@ -128,7 +125,6 @@ const PodsPage = () => {
 
         {!loading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Create New Pod Card */}
             <Link
               to="/pods/create"
               className="flex flex-col items-center justify-center h-full min-h-[280px] bg-surface-container-lowest border border-dashed border-outline-variant rounded-xl hover:border-primary hover:bg-surface-container transition-all duration-300 group"
@@ -141,7 +137,6 @@ const PodsPage = () => {
               </span>
             </Link>
 
-            {/* Pod Cards */}
             {pods.map((pod) => {
               const streak = podStreaksCache[pod._id];
               const progress = Math.min(Math.max((streak || 0) / 31 * 100, 0), 100);
@@ -214,7 +209,6 @@ const PodsPage = () => {
           </div>
         )}
 
-        {/* Mobile FAB for Create New Pod */}
         <Link
           to="/pods/create"
           className="md:hidden fixed bottom-8 right-8 h-14 w-14 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform z-40"

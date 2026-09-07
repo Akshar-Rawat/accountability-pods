@@ -53,7 +53,7 @@ const LoginPage = () => {
             Back to home
           </Link>
 
-          <div className="rounded-2xl border border-outline-variant bg-surface p-7 shadow-xl shadow-primary/5 md:p-8">
+          <div className="rounded-[20px] border border-outline-variant bg-surface-container-low p-7 shadow-xl shadow-black/20 md:p-8">
             <div className="mb-7">
               <p className="text-label-caps font-semibold text-secondary">
                 WELCOME BACK
@@ -145,7 +145,7 @@ const LoginPage = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full rounded-lg bg-primary px-5 py-3 text-body-sm font-semibold text-on-primary shadow-lg shadow-primary/15 transition-all hover:-translate-y-0.5 hover:bg-primary-container disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full rounded-full bg-primary px-5 py-3 text-body-sm font-medium text-on-primary transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading ? "Logging in..." : "Log in"}
                 </button>

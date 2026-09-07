@@ -33,22 +33,22 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed z-50 h-16 w-full border-b border-outline-variant/80 bg-surface/90 shadow-sm backdrop-blur-md">
-      <div className="mx-auto flex h-full w-full max-w-container items-center justify-between px-4">
+    <nav className="fixed z-50 h-16 w-full border-b border-outline-variant/80 bg-surface/90 backdrop-blur-md">
+      <div className="mx-auto flex h-full w-full max-w-container items-center justify-between px-5 md:px-16">
 
         <NavLink to="/" className="flex items-center" aria-label="Pact home">
           <BrandMark />
         </NavLink>
 
-        <ul className="flex items-center gap-6">
+        <ul className="flex items-center gap-0 md:gap-2">
           <li>
             <NavLink
               to="/"
               end
               className={({ isActive }) =>
                 isActive
-                  ? "rounded-md bg-surface-container-low px-3 py-2 text-body-sm text-on-surface"
-                  : "rounded-md px-3 py-2 text-body-sm text-on-surface-variant hover:text-on-surface"
+                  ? "rounded-full bg-surface-container-high px-2 py-2 text-body-sm text-on-surface md:px-3"
+                  : "rounded-full px-2 py-2 text-body-sm text-on-surface-variant hover:text-on-surface md:px-3"
               }
             >
               Home
@@ -61,11 +61,11 @@ const Navbar = () => {
                 to="/pods"
                 className={({ isActive }) =>
                   isActive
-                    ? "rounded-md bg-secondary-container px-3 py-2 font-semibold text-body-sm text-on-secondary-container"
-                    : "px-3 py-2 text-body-sm text-on-surface-variant hover:text-on-surface"
+                    ? "rounded-full bg-surface-container-high px-2 py-2 font-semibold text-body-sm text-on-secondary-container md:px-3"
+                    : "rounded-full px-2 py-2 text-body-sm text-on-surface-variant hover:text-on-surface md:px-3"
                 }
               >
-                My Pods
+                My Pacts
               </NavLink>
             </li>
           )}
@@ -79,7 +79,7 @@ const Navbar = () => {
                 variant="ghost"
                 onClick={() => navigate("/notifications")}
                 size={18}
-                className="size-10 rounded-md text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface"
+                className="size-10 rounded-full text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface"
                 aria-label="Notifications"
               >
                 <Bell  strokeWidth={1.8} />
@@ -121,13 +121,13 @@ const Navbar = () => {
             <div className="flex items-center gap-2">
               <Link
                 to="/login"
-                className="rounded-md px-3 py-2 text-body-sm text-on-surface-variant hover:text-on-surface"
+                className="rounded-full px-3 py-2 text-body-sm text-on-surface-variant hover:text-on-surface"
               >
                 Log in
               </Link>
               <Link
                 to="/register"
-                className="rounded-md bg-primary px-4 py-2 text-body-sm font-semibold text-on-primary hover:bg-primary-container"
+                className="rounded-full bg-primary px-4 py-2 text-body-sm font-medium text-on-primary transition-transform hover:scale-[1.02]"
               >
                 Sign up
               </Link>

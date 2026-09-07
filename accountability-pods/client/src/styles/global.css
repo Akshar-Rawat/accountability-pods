@@ -11,17 +11,29 @@
     background: var(--background);
     color: var(--on-background);
     font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "cv01", "cv05", "cv11", "ss03";
     text-rendering: optimizeLegibility;
   }
 
   ::selection {
-    background: var(--secondary-fixed);
-    color: var(--on-secondary-fixed);
+    background: #0099ff;
+    color: #ffffff;
   }
 
   :focus-visible {
-    outline: 2px solid var(--secondary);
+    outline: 2px solid #0099ff;
     outline-offset: 3px;
+  }
+
+  input, textarea, select {
+    border-radius: 10px;
+    background: #141414;
+    border-color: #262626;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: #0099ff !important;
+    box-shadow: 0 0 0 1px rgb(0 153 255 / 30%);
   }
 }
 
@@ -55,7 +67,7 @@
 
     .interactive-lift:hover {
       transform: translateY(-4px);
-      box-shadow: 0 18px 40px rgb(25 28 31 / 12%);
+      box-shadow: 0 18px 40px rgb(0 0 0 / 30%);
     }
   }
 

@@ -113,7 +113,7 @@ const CheckInModal = ({ isOpen, onClose, onSubmit, isSubmitting }) => {
             <button
               type="submit"
       disabled={isSubmitting || uploading}
-              className="w-full rounded bg-[#8B5A2B] px-4 py-3 text-body-md font-semibold text-white transition-colors hover:bg-[#734A23] disabled:opacity-60"
+              className="w-full rounded-full bg-primary px-4 py-3 text-body-md font-medium text-on-primary transition-transform hover:scale-[1.01] disabled:opacity-60"
             >
               {isSubmitting ? "Checking in..." : uploading ? "Uploading photo..." : "Complete Check-in"}
             </button>

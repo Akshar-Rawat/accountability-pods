@@ -26,7 +26,7 @@ const LegalPage = ({ type }) => {
 
   return (
     <section className="min-h-[calc(100vh-4rem)] bg-background px-5 py-14 md:px-16 md:py-20">
-      <article className="mx-auto max-w-3xl rounded-2xl border border-outline-variant bg-surface-container-lowest p-7 shadow-xl shadow-primary/5 md:p-10">
+      <article className="mx-auto max-w-3xl rounded-[20px] border border-outline-variant bg-surface-container-low p-7 shadow-xl shadow-black/20 md:p-10">
         <p className="text-label-caps font-semibold text-secondary">{content.eyebrow}</p>
         <h1 className="mt-3 text-headline-xl font-semibold text-primary">{content.title}</h1>
         <p className="mt-3 text-body-sm text-on-surface-variant">Last updated: September 3, 2026</p>

@@ -31,7 +31,7 @@ const ProfilePage = () => {
   return (
     <section className="min-h-[calc(100vh-4rem)] bg-background px-5 py-14 md:px-16 md:py-20">
       <div className="mx-auto max-w-3xl">
-        <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-7 shadow-xl shadow-primary/5 md:p-10">
+        <div className="rounded-[20px] border border-outline-variant bg-surface-container-low p-7 shadow-xl shadow-black/20 md:p-10">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
             <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary-container text-2xl font-semibold text-on-secondary-container">
               {user?.avatar ? (
@@ -118,14 +118,14 @@ const ProfilePage = () => {
               </label>
               <button
                 disabled={useAuthStore.getState().loading}
-                className="rounded-lg bg-secondary px-5 py-3 text-body-sm font-semibold text-on-secondary"
+                className="rounded-full bg-primary px-5 py-3 text-body-sm font-medium text-on-primary"
               >
                 Save changes
               </button>
             </form>
           )}
           {message && (
-            <p className="mt-4 text-body-sm text-teal-700">{message}</p>
+            <p className="mt-4 text-body-sm text-[#22c55e]">{message}</p>
           )}
           {error && (
             <p role="alert" className="mt-4 text-body-sm text-error">
