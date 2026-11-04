@@ -13,6 +13,8 @@ import FAQPage from "./pages/FAQPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
+import DiscoverPactsPage from "./pages/DiscoverPactsPage";
+import GlobalChatPage from "./pages/GlobalChatPage";
 import AppLayout from "./components/layout/AppLayout";
 import useAuthStore from "./stores/authStore";
 
@@ -29,10 +31,16 @@ const ProtectedRoute = ({ children }) => {
 
 const App = () => {
   const getCurrentUser = useAuthStore((state) => state.getCurrentUser);
+  const clearSession = useAuthStore((state) => state.clearSession);
 
   useEffect(() => {
     getCurrentUser().catch(() => {});
   }, [getCurrentUser]);
+
+  useEffect(() => {
+    window.addEventListener("auth:expired", clearSession);
+    return () => window.removeEventListener("auth:expired", clearSession);
+  }, [clearSession]);
 
   return (
     <Routes>
@@ -53,6 +61,8 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/discover" element={<ProtectedRoute><DiscoverPactsPage /></ProtectedRoute>} />
+        <Route path="/global-chat" element={<ProtectedRoute><GlobalChatPage /></ProtectedRoute>} />
 
         <Route
           path="/pods/create"

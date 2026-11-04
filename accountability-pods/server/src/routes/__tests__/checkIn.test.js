@@ -4,6 +4,7 @@ import request from "supertest";
 import { app } from "../../app.js";
 import CheckIn from "../../models/checkIn.model.js";
 import Streak from "../../models/streak.model.js";
+import Message from "../../models/message.model.js";
 import { createTestUser, createTestPod } from "../../test/helpers.js";
 
 describe("CheckIn Routes", () => {
@@ -59,6 +60,22 @@ describe("CheckIn Routes", () => {
       expect(dbStreak.currentStreak).toBe(1);
       expect(dbStreak.longestStreak).toBe(1);
       expect(dbStreak.lastCheckInDate).toBe("2026-01-01");
+    });
+
+    it("keeps check-in proof in check-ins instead of creating a chat message", async () => {
+      const { token, user } = await createTestUser({ timezone: "UTC" });
+      const pod = await createTestPod(user._id);
+      vi.setSystemTime(new Date("2026-01-01T10:00:00Z"));
+
+      const response = await request(app)
+        .post(`/api/v1/pods/${pod._id}/checkins`)
+        .set("Authorization", `Bearer ${token}`)
+        .send({ note: "Workout complete", photoUrl: "https://example.com/proof.jpg" });
+
+      expect(response.status).toBe(201);
+      const proof = await CheckIn.findOne({ pod: pod._id, user: user._id });
+      expect(proof.photoUrl).toBe("https://example.com/proof.jpg");
+      expect(await Message.countDocuments({ pod: pod._id })).toBe(0);
     });
 
     it("should reject check-in if user is not a member", async () => {
@@ -331,6 +348,22 @@ describe("CheckIn Routes", () => {
       );
 
       expect(res.status).toBe(401);
+    });
+  });
+
+  describe("GET /api/v1/pods/:podId/checkins/proofs", () => {
+    it("returns historic proof from all pact members to a member", async () => {
+      const first = await createTestUser({ timezone: "UTC" });
+      const second = await createTestUser({ timezone: "UTC" });
+      const pod = await createTestPod(first.user._id, { members: [first.user._id, second.user._id] });
+      await CheckIn.create({ pod: pod._id, user: first.user._id, date: "2026-01-01", photoUrl: "https://example.com/old-proof.jpg" });
+
+      const response = await request(app).get(`/api/v1/pods/${pod._id}/checkins/proofs`).set("Authorization", `Bearer ${second.token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toHaveLength(1);
+      expect(response.body.data[0].photoUrl).toBe("https://example.com/old-proof.jpg");
+      expect(response.body.data[0].user.username).toBe(first.user.username);
     });
   });
 

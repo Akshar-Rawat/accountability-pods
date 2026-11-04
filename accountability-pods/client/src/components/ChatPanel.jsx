@@ -52,11 +52,6 @@ const ChatPanel = ({ podId, currentUserId }) => {
 
     const handleMemberCheckedIn = (data) => {
       updateStreaks(data);
-      if (data.systemMessage) {
-        setMessages((prev) => prev.some((message) => message._id === data.systemMessage._id)
-          ? prev
-          : [...prev, data.systemMessage]);
-      }
     };
 
     const handleError = (error) => {

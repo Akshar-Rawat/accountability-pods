@@ -12,12 +12,15 @@ import useAuthStore from "../stores/authStore";
 import CheckInModal from "../components/CheckInModal";
 import ChatPanel from "../components/ChatPanel";
 import NotificationSettings from "../components/NotificationSettings";
+import api from "../lib/axios";
 
 const PodDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [visibilitySaving, setVisibilitySaving] = useState(false);
+  const [checkInProofs, setCheckInProofs] = useState([]);
 
   const {
     currentPod,
@@ -41,6 +44,9 @@ const PodDetailsPage = () => {
     getPodStreak(id);
     getTodaysCheckIns(id);
     getPodStreaks(id);
+    api.get(`/pods/${id}/checkins/proofs`).then((response) => {
+      setCheckInProofs(Array.isArray(response.data?.data) ? response.data.data : []);
+    }).catch(() => setCheckInProofs([]));
 
     return () => {
       clearCurrentPod();
@@ -54,6 +60,8 @@ const PodDetailsPage = () => {
   const handleCheckInSubmit = async ({ note, photoUrl }) => {
     try {
       await checkIn(id, note, photoUrl);
+      const response = await api.get(`/pods/${id}/checkins/proofs`);
+      setCheckInProofs(Array.isArray(response.data?.data) ? response.data.data : []);
       setIsModalOpen(false);
     } catch {
       return;
@@ -135,38 +143,24 @@ const PodDetailsPage = () => {
           <p className="text-label-caps font-semibold text-secondary uppercase tracking-widest mb-4">
             {currentPod.frequency} ACCOUNTABILITY
           </p>
-          <h1 className="text-4xl md:text-5xl font-medium tracking-tight text-primary">
-            Consistency is the only metric<br />that matters.
+          <h1 className="mx-auto max-w-3xl text-3xl font-medium tracking-tight text-primary sm:text-4xl md:text-5xl">
+            Consistency is the only metric that matters.
           </h1>
         </div>
 
-        <div className="flex justify-center mb-24">
+        <div className="mb-16 flex justify-center">
           <button
             onClick={() => !hasCheckedInToday && setIsModalOpen(true)}
             disabled={hasCheckedInToday}
             aria-label={hasCheckedInToday ? "Checked in today" : "Check in for today's target"}
-            className={`group relative flex size-72 flex-col items-center justify-center rounded-full p-[1px] transition-all duration-300 focus-visible:outline-secondary focus-visible:outline-offset-4 ${
+            className={`inline-flex items-center gap-3 rounded-full px-6 py-3.5 text-body-md font-semibold shadow-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary ${
               hasCheckedInToday
-                ? "cursor-default bg-outline-variant"
-                : "bg-[conic-gradient(from_210deg,#0099ff,#0099ff55,#262626,#0099ff)] shadow-[0_0_60px_rgba(0,153,255,.12)] hover:scale-[1.025] hover:shadow-[0_0_80px_rgba(0,153,255,.18)]"
+                ? "cursor-default border border-[#22c55e]/30 bg-[#22c55e]/10 text-[#22c55e]"
+                : "bg-primary text-on-primary hover:bg-primary/90"
             }`}
           >
-            <span className={`absolute inset-[10px] rounded-full border ${hasCheckedInToday ? "border-outline-variant" : "border-white/15"}`} />
-            <span className={`absolute inset-[28px] rounded-full border ${hasCheckedInToday ? "border-outline-variant" : "border-white/10 group-hover:border-white/25"} transition-colors`} />
-            <span className="absolute inset-[47px] rounded-full bg-surface-container-low" />
-            {hasCheckedInToday ? (
-              <span className="relative z-10 flex flex-col items-center">
-                <span className="mb-3 flex size-12 items-center justify-center rounded-full bg-[#22c55e]/15 text-[#22c55e]"><CheckCircle size={25} /></span>
-                <span className="text-xl font-medium tracking-[-.04em] text-primary">Checked in</span>
-                <span className="mt-1 text-[11px] font-medium uppercase tracking-[.12em] text-on-surface-variant">Come back tomorrow</span>
-              </span>
-            ) : (
-              <span className="relative z-10 flex flex-col items-center">
-                <span className="mb-4 flex size-10 items-center justify-center rounded-full bg-primary text-on-primary transition-transform group-hover:scale-110"><CheckCircle size={19} /></span>
-                <span className="text-2xl font-medium tracking-[-.05em] text-primary">Check in</span>
-                <span className="mt-1 text-[11px] font-medium uppercase tracking-[.12em] text-on-surface-variant">Today’s target</span>
-              </span>
-            )}
+            <CheckCircle size={19} />
+            <span>{hasCheckedInToday ? "Checked in today" : "Check in today"}</span>
           </button>
         </div>
 
@@ -266,7 +260,37 @@ const PodDetailsPage = () => {
           </div>
         </div>
 
+        <section className="mt-14 rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 sm:p-7">
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-headline-md font-semibold text-primary">Check-in proof</h2>
+              <p className="mt-1 text-body-sm text-on-surface-variant">Recent check-in photos and notes stay here, separate from chat.</p>
+            </div>
+            <span className="shrink-0 rounded-full bg-surface-container px-3 py-1 text-label-caps text-on-surface-variant">{checkInProofs.length} recent</span>
+          </div>
+          {!checkInProofs.length ? (
+            <p className="rounded-xl border border-dashed border-outline-variant p-6 text-center text-body-sm text-on-surface-variant">No check-in proof yet.</p>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {checkInProofs.map((checkIn, index) => {
+                const member = checkIn.user?._id ? checkIn.user : currentPod.members?.find((item) => String(item._id) === String(checkIn.user));
+                return <article key={checkIn._id || `${checkIn.user?._id || checkIn.user}-${index}`} className="overflow-hidden rounded-xl border border-outline-variant bg-surface p-4">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <p className="text-body-sm font-semibold text-primary">{member?.username || (String(checkIn.user?._id || checkIn.user) === String(user?._id) ? user.username : "Pact member")}{String(checkIn.user?._id || checkIn.user) === String(user?._id) ? " · You" : ""}</p>
+                    <span className="text-label-caps text-on-surface-variant">{checkIn.date}</span>
+                  </div>
+                  {checkIn.photoUrl && <a href={checkIn.photoUrl} target="_blank" rel="noreferrer" className="mb-3 block"><img src={checkIn.photoUrl} alt={`${member?.username || "Member"}'s check-in proof`} className="max-h-72 w-full rounded-lg object-cover" /></a>}
+                  {checkIn.note && <p className="whitespace-pre-wrap text-body-sm text-on-surface-variant">{checkIn.note}</p>}
+                  {!checkIn.photoUrl && !checkIn.note && <p className="text-body-sm text-on-surface-variant">Check-in complete. No photo or note added.</p>}
+                </article>;
+              })}
+            </div>
+          )}
+        </section>
+
         <div className="mt-16 flex flex-col items-center justify-center gap-4 border-t border-outline-variant pt-8">
+           <p className="text-body-sm text-on-surface-variant">{currentPod.visibility === "public" ? "Public pact · discoverable by members" : "Private pact · invite code only"}</p>
+           {String(currentPod.admin?._id || currentPod.admin) === String(user?._id) && <button disabled={visibilitySaving} onClick={async () => { setVisibilitySaving(true); try { await api.put(`/pods/${id}`, { visibility: currentPod.visibility === "public" ? "private" : "public" }); await getPodById(id); } finally { setVisibilitySaving(false); } }} className="text-body-sm font-medium text-primary underline disabled:opacity-50">{visibilitySaving ? "Updating…" : `Make ${currentPod.visibility === "public" ? "private" : "public"}`}</button>}
            <p className="text-body-sm text-on-surface-variant">
              Invite Code: <span className="font-mono font-bold text-primary">{currentPod.inviteCode}</span>
            </p>

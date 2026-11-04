@@ -69,6 +69,10 @@ const Navbar = () => {
               </NavLink>
             </li>
           )}
+          {isAuthenticated && <>
+            <li><NavLink to="/discover" className={({ isActive }) => isActive ? "rounded-full bg-surface-container-high px-2 py-2 text-body-sm text-primary md:px-3" : "rounded-full px-2 py-2 text-body-sm text-on-surface-variant hover:text-on-surface md:px-3"}>Discover</NavLink></li>
+            <li><NavLink to="/global-chat" className={({ isActive }) => isActive ? "rounded-full bg-surface-container-high px-2 py-2 text-body-sm text-primary md:px-3" : "rounded-full px-2 py-2 text-body-sm text-on-surface-variant hover:text-on-surface md:px-3"}>Global Chat</NavLink></li>
+          </>}
         </ul>
 
         <div className="flex items-center gap-2">

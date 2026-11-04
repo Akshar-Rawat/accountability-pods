@@ -81,6 +81,12 @@ const useAuthStore = create((set) => ({
     }
   },
 
+  clearSession: () => {
+    localStorage.removeItem("accessToken");
+    disconnectSocket();
+    set({ user: null, isAuthenticated: false, isRestoring: false, loading: false });
+  },
+
   updateAccount: async (details) => {
     set({ loading: true });
     try {

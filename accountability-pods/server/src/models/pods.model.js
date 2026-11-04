@@ -60,6 +60,7 @@ const podSchema = new Schema(
         message: "Max members must be a whole number",
       },
     },
+    visibility: { type: String, enum: ["public", "private"], default: "private", index: true },
   },
   {
     timestamps: true,

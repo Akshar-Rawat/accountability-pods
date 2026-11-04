@@ -8,6 +8,8 @@ import {
   leavePod,
   updatePod,
   getPodMembers,
+  getPublicPods,
+  joinPublicPod,
 } from "../controllers/pod.controller.js";
 
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -21,6 +23,9 @@ router
 router
   .route("/my-pods")
   .get(verifyJWT, getMyPods);
+
+router.route("/public").get(verifyJWT, getPublicPods);
+router.route("/public/:id/join").post(verifyJWT, joinPublicPod);
 
 router
   .route("/join/:inviteCode")

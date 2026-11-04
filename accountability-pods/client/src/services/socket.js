@@ -7,9 +7,7 @@ export const connectSocket = () => {
   if (!socket) {
     socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000', {
       withCredentials: true,
-      auth: {
-        token: localStorage.getItem('accessToken'),
-      },
+      auth: (callback) => callback({ token: localStorage.getItem('accessToken') }),
     });
 
     socket.on('connect', () => {

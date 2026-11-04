@@ -15,6 +15,7 @@ const CreatePodPage = () => {
     frequency: "daily",
     customDays: [],
     maxMembers: 5,
+    visibility: "private",
   });
 
   const [error, setError] = useState("");
@@ -73,6 +74,7 @@ const CreatePodPage = () => {
         frequency: formData.frequency,
         customDays: formData.frequency === "custom" ? formData.customDays : [],
         maxMembers: Number(formData.maxMembers),
+        visibility: formData.visibility,
       });
 
       navigate("/pods");
@@ -139,6 +141,19 @@ const CreatePodPage = () => {
                   className="w-full rounded-lg border border-outline-variant bg-surface px-3 py-2.5 text-body-sm text-on-surface outline-none placeholder:text-on-surface-variant transition-shadow focus:border-primary focus:ring-2 focus:ring-secondary/20"
                 />
               </div>
+
+              <fieldset>
+                <legend className="mb-2 text-body-sm font-medium text-primary">Who can find this pact?</legend>
+                <div className="grid grid-cols-2 gap-2">
+                  {[{ value: "private", label: "Private", help: "Invite code only" }, { value: "public", label: "Public", help: "Discoverable by members" }].map((option) => (
+                    <label key={option.value} className={`cursor-pointer rounded-lg border p-3 ${formData.visibility === option.value ? "border-primary bg-surface-container-low" : "border-outline-variant"}`}>
+                      <input className="sr-only" type="radio" name="visibility" value={option.value} checked={formData.visibility === option.value} onChange={handleChange} />
+                      <span className="block text-body-sm font-medium capitalize text-primary">{option.label}</span>
+                      <span className="text-label-caps text-on-surface-variant">{option.help}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
 
 
               <div>

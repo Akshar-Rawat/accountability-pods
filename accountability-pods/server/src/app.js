@@ -33,6 +33,7 @@ import CheckInRoutes from "./routes/checkIn.route.js";
 import streakRoutes from "./routes/streak.route.js";
 import messageRoutes from "./routes/message.route.js";
 import notificationRoutes from "./routes/notification.route.js";
+import globalChatRoutes from "./routes/globalChat.route.js";
 //routes declaration
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/pods", podRoutes);
@@ -40,4 +41,5 @@ app.use("/api/v1/pods", CheckInRoutes);
 app.use("/api/v1/pods", streakRoutes);
 app.use("/api/v1/pods", messageRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
+app.use("/api/v1/global-chat", globalChatRoutes);
 export {app}

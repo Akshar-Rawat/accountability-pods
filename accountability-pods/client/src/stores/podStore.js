@@ -210,7 +210,7 @@ const usePodStore = create((set, get) => ({
       const { checkIn, streak } = response.data.data;
 
       set((state) => ({
-        todaysCheckIns: [...state.todaysCheckIns, checkIn],
+        todaysCheckIns: [...state.todaysCheckIns.filter((item) => item._id !== checkIn._id), checkIn],
         myCurrentStreak: streak,
         checkInLoading: false,
       }));
@@ -240,7 +240,9 @@ const usePodStore = create((set, get) => ({
 
       return {
         podStreaks: updatedPodStreaks,
-        todaysCheckIns: [...state.todaysCheckIns, { user: { _id: userId } }],
+        todaysCheckIns: data.checkIn
+          ? [...state.todaysCheckIns.filter((checkIn) => String(checkIn.user?._id || checkIn.user) !== String(userId)), data.checkIn]
+          : [...state.todaysCheckIns, { user: { _id: userId } }],
       };
     });
   },

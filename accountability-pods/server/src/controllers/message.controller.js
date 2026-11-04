@@ -21,7 +21,8 @@ const getPodMessages = asyncHandler(async (req, res) => {
     throw new ApiError(403, "You are not a member of this pod");
   }
 
-  const query = { pod: podId };
+  // Check-in proofs have their own section; legacy check-in system messages stay out of chat.
+  const query = { pod: podId, type: { $ne: "system" } };
 
   if (before) {
     query.createdAt = { $lt: new Date(before) };

@@ -29,7 +29,7 @@ const validateCustomDays = (frequency, customDays) => {
 };
 
 const createPod = asyncHandler(async (req, res) => {
-  const { name, goal, frequency, customDays, maxMembers = 5 } = req.body;
+  const { name, goal, frequency, customDays, maxMembers = 5, visibility = "private" } = req.body;
 
   const adminId = req.user._id;
 
@@ -48,6 +48,7 @@ const createPod = asyncHandler(async (req, res) => {
   }
 
   const normalizedCustomDays = validateCustomDays(frequency, customDays);
+  if (!["public", "private"].includes(visibility)) throw new ApiError(400, "Invalid visibility");
 
   const inviteCode = nanoid(8);
 
@@ -60,6 +61,7 @@ const createPod = asyncHandler(async (req, res) => {
     admin: adminId,
     inviteCode,
     maxMembers: Number(maxMembers),
+    visibility,
   });
 
   return res
@@ -77,6 +79,31 @@ const getMyPods = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, pods, "Pods retrieved successfully"));
+});
+
+const getPublicPods = asyncHandler(async (req, res) => {
+  const { search = "", frequency } = req.query;
+  const query = { visibility: "public" };
+  if (frequency && ["daily", "weekdays", "monthly", "custom"].includes(frequency)) query.frequency = frequency;
+  const safeSearch = search.trim().slice(0, 80).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  if (safeSearch) query.$or = [{ name: { $regex: safeSearch, $options: "i" } }, { goal: { $regex: safeSearch, $options: "i" } }];
+  const pods = await Pod.find(query).populate("members", "username avatar").sort({ createdAt: -1 }).limit(100);
+  res.status(200).json(new ApiResponse(200, pods, "Public pacts retrieved successfully"));
+});
+
+const joinPublicPod = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const pod = await Pod.findOneAndUpdate(
+    { _id: req.params.id, visibility: "public", members: { $ne: userId }, $expr: { $lt: [{ $size: "$members" }, "$maxMembers"] } },
+    { $addToSet: { members: userId } }, { new: true },
+  );
+  if (!pod) {
+    const existing = await Pod.findOne({ _id: req.params.id, visibility: "public" });
+    if (!existing) throw new ApiError(404, "Public pact not found");
+    if (existing.members.some((member) => member.equals(userId))) throw new ApiError(400, "You are already a member");
+    throw new ApiError(400, "Pact is full");
+  }
+  res.status(200).json(new ApiResponse(200, pod, "Joined public pact successfully"));
 });
 
 const getPodById = asyncHandler(async (req, res) => {
@@ -189,7 +216,7 @@ const updatePod = asyncHandler(async (req, res) => {
   const podId = req.params.id;
   const userId = req.user._id;
 
-  const { name, goal, frequency, customDays, maxMembers } = req.body;
+  const { name, goal, frequency, customDays, maxMembers, visibility } = req.body;
 
   const pod = await Pod.findById(podId);
 
@@ -245,6 +272,11 @@ const updatePod = asyncHandler(async (req, res) => {
     pod.maxMembers = Number(maxMembers);
   }
 
+  if (visibility !== undefined) {
+    if (!["public", "private"].includes(visibility)) throw new ApiError(400, "Invalid visibility");
+    pod.visibility = visibility;
+  }
+
   await pod.save();
 
   return res
@@ -280,6 +312,8 @@ const getPodMembers = asyncHandler(async (req, res) => {
 export {
   createPod,
   getMyPods,
+  getPublicPods,
+  joinPublicPod,
   getPodById,
   joinPod,
   leavePod,

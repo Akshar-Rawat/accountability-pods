@@ -44,6 +44,13 @@ describe("Pod Routes", () => {
       expect(secondResponse.body.data.maxMembers).toBe(10);
     });
 
+    it("creates a public pact when requested", async () => {
+      const { token } = await createTestUser();
+      const response = await request(app).post("/api/v1/pods").set("Authorization", `Bearer ${token}`).send({ name: "Open", goal: "Read", frequency: "daily", visibility: "public" });
+      expect(response.status).toBe(201);
+      expect(response.body.data.visibility).toBe("public");
+    });
+
     it("should reject creation if unauthenticated", async () => {
       const res = await request(app).post("/api/v1/pods").send({
         name: "Test",
@@ -118,6 +125,28 @@ describe("Pod Routes", () => {
         .set("Authorization", `Bearer ${newMember.token}`);
 
       expect(res.status).toBeGreaterThanOrEqual(400);
+    });
+  });
+
+  describe("Public pact discovery and joining", () => {
+    it("only returns public pacts and permits a logged-in user to join", async () => {
+      const owner = await createTestUser(); const visitor = await createTestUser();
+      const publicPod = await createTestPod(owner.user._id, { visibility: "public" });
+      await createTestPod(owner.user._id, { visibility: "private" });
+      const list = await request(app).get("/api/v1/pods/public").set("Authorization", `Bearer ${visitor.token}`);
+      expect(list.status).toBe(200);
+      expect(list.body.data.map((pod) => pod._id)).toContain(publicPod.id);
+      expect(list.body.data).toHaveLength(1);
+      const joined = await request(app).post(`/api/v1/pods/public/${publicPod.id}/join`).set("Authorization", `Bearer ${visitor.token}`);
+      expect(joined.status).toBe(200);
+      expect(joined.body.data.members.map((id) => String(id._id || id))).toContain(String(visitor.user.id));
+    });
+
+    it("does not permit joining a private pact through public join", async () => {
+      const owner = await createTestUser(); const visitor = await createTestUser();
+      const privatePod = await createTestPod(owner.user._id);
+      const response = await request(app).post(`/api/v1/pods/public/${privatePod.id}/join`).set("Authorization", `Bearer ${visitor.token}`);
+      expect(response.status).toBe(404);
     });
   });
 

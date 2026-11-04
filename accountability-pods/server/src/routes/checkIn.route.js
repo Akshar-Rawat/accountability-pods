@@ -3,6 +3,7 @@ import {
   createCheckIn,
   getTodaysCheckIns,
   getCheckInHistory,
+  getPodCheckInProofs,
   uploadImage
 } from "../controllers/checkIn.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -43,6 +44,7 @@ router
   .get(verifyJWT, getTodaysCheckIns);
 
 router.route("/:podId/checkins/history").get(verifyJWT, getCheckInHistory);
+router.route("/:podId/checkins/proofs").get(verifyJWT, getPodCheckInProofs);
 router.route("/upload-image").post(
   verifyJWT,
   parseImageUpload,
