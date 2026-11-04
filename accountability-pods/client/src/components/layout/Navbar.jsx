@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { Bell, LogOut,Settings,User } from "lucide-react";
+import { Bell, Compass, House, LogOut, MessageCircle, Settings, UsersRound, User } from "lucide-react";
 import BrandMark from "../BrandMark";
 
 import Avatar from "../ui/Avatar";
@@ -47,11 +47,11 @@ const Navbar = () => {
               end
               className={({ isActive }) =>
                 isActive
-                  ? "rounded-full bg-surface-container-high px-2 py-2 text-body-sm text-on-surface md:px-3"
-                  : "rounded-full px-2 py-2 text-body-sm text-on-surface-variant hover:text-on-surface md:px-3"
+                  ? "inline-flex items-center gap-1.5 rounded-full bg-surface-container-high px-2 py-2 text-body-sm text-on-surface md:px-3"
+                  : "inline-flex items-center gap-1.5 rounded-full px-2 py-2 text-body-sm text-on-surface-variant hover:text-on-surface md:px-3"
               }
             >
-              Home
+              <House size={16} aria-hidden="true" />Home
             </NavLink>
           </li>
 
@@ -61,17 +61,17 @@ const Navbar = () => {
                 to="/pods"
                 className={({ isActive }) =>
                   isActive
-                    ? "rounded-full bg-surface-container-high px-2 py-2 font-semibold text-body-sm text-on-secondary-container md:px-3"
-                    : "rounded-full px-2 py-2 text-body-sm text-on-surface-variant hover:text-on-surface md:px-3"
+                    ? "inline-flex items-center gap-1.5 rounded-full bg-surface-container-high px-2 py-2 font-semibold text-body-sm text-on-secondary-container md:px-3"
+                    : "inline-flex items-center gap-1.5 rounded-full px-2 py-2 text-body-sm text-on-surface-variant hover:text-on-surface md:px-3"
                 }
               >
-                My Pacts
+                <UsersRound size={16} aria-hidden="true" />My Pacts
               </NavLink>
             </li>
           )}
           {isAuthenticated && <>
-            <li><NavLink to="/discover" className={({ isActive }) => isActive ? "rounded-full bg-surface-container-high px-2 py-2 text-body-sm text-primary md:px-3" : "rounded-full px-2 py-2 text-body-sm text-on-surface-variant hover:text-on-surface md:px-3"}>Discover</NavLink></li>
-            <li><NavLink to="/global-chat" className={({ isActive }) => isActive ? "rounded-full bg-surface-container-high px-2 py-2 text-body-sm text-primary md:px-3" : "rounded-full px-2 py-2 text-body-sm text-on-surface-variant hover:text-on-surface md:px-3"}>Global Chat</NavLink></li>
+            <li><NavLink to="/discover" className={({ isActive }) => isActive ? "inline-flex items-center gap-1.5 rounded-full bg-surface-container-high px-2 py-2 text-body-sm text-primary md:px-3" : "inline-flex items-center gap-1.5 rounded-full px-2 py-2 text-body-sm text-on-surface-variant hover:text-on-surface md:px-3"}><Compass size={16} aria-hidden="true" />Discover</NavLink></li>
+            <li><NavLink to="/global-chat" className={({ isActive }) => isActive ? "inline-flex items-center gap-1.5 rounded-full bg-surface-container-high px-2 py-2 text-body-sm text-primary md:px-3" : "inline-flex items-center gap-1.5 rounded-full px-2 py-2 text-body-sm text-on-surface-variant hover:text-on-surface md:px-3"}><MessageCircle size={16} aria-hidden="true" />Global Chat</NavLink></li>
           </>}
         </ul>
 
